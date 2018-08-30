@@ -25,8 +25,9 @@
 # **************************************************************************
 
 from pyworkflow.tests import BaseTest, DataSet, setupTestProject
-from pyworkflow.em.packages.bsoft.protocol_blocres import BsoftProtBlocres
 from pyworkflow.em.protocol import ProtImportVolumes, ProtImportMask
+
+from bsoft.protocols import BsoftProtBlocres
 
 
 
@@ -68,7 +69,6 @@ class TestBsoftBlocres(TestBsoftBlocresBase):
         cls.protImportHalf2 = cls.runImportVolumes(cls.half2, 3.54)
         cls.protCreateMask = cls.runImportMask(cls.mask, 3.54)
 
-
     def testBlocres1(self):
         blocres = self.newProtocol(BsoftProtBlocres,
                                    objLabel='blocres',
@@ -87,4 +87,4 @@ class TestBsoftBlocres(TestBsoftBlocresBase):
                                    smooth=True)
         self.launchProtocol(blocres)
         self.assertIsNotNone(blocres.resolution_Volume,
-                        "blocres has failed")
+                             "blocres has failed")

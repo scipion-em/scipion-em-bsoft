@@ -1,8 +1,8 @@
 # **************************************************************************
 # *
-# * Authors:     J.M. De la Rosa Trevin (jmdelarosa@cnb.csic.es)
+# * Authors:     J.M. De la Rosa Trevin (delarosatrevin@scilifelab.se)
 # *
-# * Unidad de  Bioinformatica of Centro Nacional de Biotecnologia , CSIC
+# * SciLifeLab, Stockholm University
 # *
 # * This program is free software; you can redistribute it and/or modify
 # * it under the terms of the GNU General Public License as published by
@@ -23,14 +23,15 @@
 # *  e-mail address 'scipion@cnb.csic.es'
 # *
 # **************************************************************************
-"""
-Particle filter operations.
-"""
 
 import pyworkflow.utils as pwutils
 import pyworkflow.protocol.params as params
 import pyworkflow.em as em
 
+import bsoft
+from bsoft.constants import (FILTER_MEDIAN, FILTER_PEAK,
+                             FILTER_GRADIENT, FILTER_LAPLACIAN,
+                             FILTER_DENOISE)
        
 """
 -rescale -0.1,5.2        Rescale data to average and standard deviation after filtering.
@@ -61,45 +62,33 @@ Parameters:
 -datatype u              Force writing of a new data type.
 -sampling 1.5,1.5,1.5    Sampling (A/pixel; default from input file; a single value can be given).
 -wrap                    Turn wrapping on (default off, use with -denoise option).
-
 """
 
-FILTER_MEDIAN = 0
-FILTER_PEAK = 1
-FILTER_GRADIENT = 2
-FILTER_LAPLACIAN = 3
-FILTER_DENOISE = 4
 
 
 class BsoftProtBfilter(em.ProtFilterParticles):
-    """ Wrapper around bfilter program.
-    """
+    """ Wrapper around bfilter program of BSOFT. """
     _label = 'bfilter'
     
     def __init__(self, **kwargs):
         em.ProtFilterParticles.__init__(self, **kwargs)
 
-    #--------------------------- DEFINE param functions --------------------------------------------   
+    #--------------------------- DEFINE param functions ------------------------
     def _defineProcessParams(self, form):
         form.addParam('filterType', params.EnumParam, 
-                      choices=['median', 
-                               'peak', 
-                               'gradient', 
-                               'laplacian',
-                               'denoise'
-                               ],
+                      choices=['median', 'peak', 'gradient',
+                               'laplacian', 'denoise'],
                       label="Filter type", default=0,
-                      help="""Select what type of filter do you want to apply.
-                           """)
- 
+                      help="Select what type of filter do you want to apply.")
         form.addParam('kernelEdgeSize', params.IntParam, default=3,
                       label='Kernel edge size', 
-                      condition='filterType==%d or filterType==%d' % (FILTER_MEDIAN, FILTER_PEAK))
+                      condition='filterType==%d or filterType==%d' % (
+                          FILTER_MEDIAN, FILTER_PEAK))
 
         line = form.addLine('Denoise',
                             condition='filterType==%d' % FILTER_DENOISE,
                             help="Denoising filter: distance and density difference sigmas.")
-        line.addParam('denoiseDistance', params.IntParam, default=2, 
+        line.addParam('denoiseDistance', params.IntParam, default=2,
                       label='distance')
         line.addParam('denoiseDensity', params.FloatParam, default=0.4,
                       label='density')        
@@ -124,16 +113,17 @@ class BsoftProtBfilter(em.ProtFilterParticles):
 #                       help='Enter a temperature parameter T The filter falls off roughly within \n'
 #                            'this reciprocal distance (in terms of frequency units).')     
         
-    #--------------------------- INSERT steps functions --------------------------------------------  
+    #--------------------------- INSERT steps functions -----------------------
     def _insertAllSteps(self):
         # Insert processing steps
         self._insertFunctionStep('convertInputStep', self.inputParticles.get().strId())
         self._insertFunctionStep('filterStep', self.getFilterArgs())
         self._insertFunctionStep('createOutputStep')
 
-    #--------------------------- STEPS functions --------------------------------------------   
+    #--------------------------- STEPS functions ------------------------------
     def convertInputStep(self, strId):
-        # we need to put all images into a single stack to ease the call of bsoft programs
+        # we need to put all images into a single stack
+        # to ease the call of bsoft programs
         self.inputParticles.get().writeStack(self._getPath('particles.spi:stk'))
     
     def getFilterArgs(self):
@@ -157,7 +147,9 @@ class BsoftProtBfilter(em.ProtFilterParticles):
         """ Util function used by wizard. """
         self.setStepsExecutor() # set default execution
         args = self.getFilterArgs()
-        self.runJob('bfilter', args + ' %s %s' % (inputStk, outputStk))
+
+        self.runJob(bsoft.Plugin.getProgram('bfilter'), args +
+                    ' %s %s' % (inputStk, outputStk))
         
     def filterStep(self, args):
         """ Apply the selected filter to particles. 
@@ -166,7 +158,8 @@ class BsoftProtBfilter(em.ProtFilterParticles):
         particlesStk = self._getPath('particles.spi')
         tmpStk = particlesStk.replace('.spi', '_tmp.spi')
         self.runJob('bfilter', args + ' %s %s' % (particlesStk, tmpStk))
-        pwutils.moveFile(tmpStk, particlesStk.replace('.spi', '.stk')) # just we prefer stk as stack of spider images
+        pwutils.moveFile(tmpStk, particlesStk.replace('.spi', '.stk'))
+        # just we prefer stk as stack of spider images
         pwutils.cleanPath(particlesStk)
         
     def createOutputStep(self):
@@ -182,14 +175,10 @@ class BsoftProtBfilter(em.ProtFilterParticles):
         self._defineOutputs(outputParticles=outputSet)
         self._defineTransformRelation(inputSet, outputSet)
         
-#--------------------------- INFO functions -------------------------------------------- 
+#--------------------------- INFO functions -----------------------------------
     def _validate(self):
         errors = []
         return errors
-    
-    def _citations(self):
-        cites = []
-        return cites
     
     def _summary(self):
         summary = []

@@ -1,8 +1,8 @@
 # **************************************************************************
 # *
-# * Authors:     Airen
+# * Authors:     J.M. De la Rosa Trevin (delarosatrevin@scilifelab.se)
 # *
-# * Unidad de  Bioinformatica of Centro Nacional de Biotecnologia , CSIC
+# * SciLifeLab, Stockholm University
 # *
 # * This program is free software; you can redistribute it and/or modify
 # * it under the terms of the GNU General Public License as published by
@@ -24,26 +24,6 @@
 # *
 # **************************************************************************
 
-import os
-
-from pyworkflow.utils import environAdd, Environ
-
-
-
-def loadEnvironment():
-    BSOFT_HOME = os.environ['BSOFT_HOME']
-    BSOFT_BIN = os.path.join(BSOFT_HOME, 'bin')
-    environAdd('PATH', BSOFT_BIN)
-    os.environ['BSOFT'] = BSOFT_HOME
-
-
-def getEnviron(xmippFirst=True):
-    """ Create the needed environment for Bsoft programs. """
-    environ = Environ(os.environ)
-    pos = Environ.BEGIN if xmippFirst else Environ.END
-    environ.update({
-            'PATH': os.path.join(os.environ['BSOFT_HOME'], 'bin'),
-            #'LD_LIBRARY_PATH': join(os.environ['BSOFT_HOME'], 'lib')
-            }, position=pos)
-    return environ
-    
+from protocol_bfilter import BsoftProtBfilter
+from protocol_blocres import BsoftProtBlocres
+from protocol_particle_pick import BsoftProtParticlePicking

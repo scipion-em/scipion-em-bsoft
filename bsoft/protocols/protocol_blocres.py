@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # **************************************************************************
 # *
 # * Authors:     J.L. Vilas (jlvilas@cnb.csic.es)
@@ -24,37 +23,28 @@
 # *  e-mail address 'scipion@cnb.csic.es'
 # *
 # **************************************************************************
-"""
-Local Resolution
-"""
 
-from pyworkflow import VERSION_1_1
+import numpy as np
+
 import pyworkflow.protocol.params as params
-# from pyworkflow.utils import getExt
 from pyworkflow.em.protocol.protocol_3d import ProtAnalysis3D
 from pyworkflow.em import ImageHandler
 from pyworkflow.object import Float
-# from collections import OrderedDict
 from pyworkflow.em.data import Volume
-import numpy as np
-# import pyworkflow.em.metadata as md
-       
-"""
-Bsoft program: blocres
-It calculates the local resolution map from to half maps.
-The method is based on a local measurement inside a mobile window.
-"""
 
-FN_HALF1 = 'half1'
-FN_HALF2 = 'half2'
-FN_MASKVOL = 'maskvol'
-FN_RESOLMAP = 'resolutionMap'
+import bsoft
+from bsoft.constants import (FN_HALF1, FN_HALF2,
+                             FN_MASKVOL, FN_RESOLMAP)
+
+
 
 class BsoftProtBlocres(ProtAnalysis3D):
-    """ Wrapper around blocres program.
+    """
+    Bsoft program: blocres
+    It calculates the local resolution map from to half maps.
+    The method is based on a local measurement inside a mobile window.
     """
     _label = 'blocres'
-    _version = VERSION_1_1
 
     def __init__(self, **args):
         ProtAnalysis3D.__init__(self, **args)
@@ -68,82 +58,75 @@ class BsoftProtBlocres(ProtAnalysis3D):
         form.addParam('inputVolume', params.PointerParam,
                       pointerClass='Volume',
                       label="Half 1",
-                      help="""Select first half volume to compute the
-                      local resolution.
-                      """)
+                      help="Select first half volume to compute the "
+                      "local resolution.")
         form.addParam('inputVolume2', params.PointerParam,
                       pointerClass='Volume',
                       label="Half 2",
-                      help="""Select first half volume to compute the
-                      local resolution.
-                      """)
+                      help="Select first half volume to compute the "
+                      "local resolution.")
         form.addParam('mask', params.PointerParam, allowsNull=True,
                       pointerClass='Volume',
                       label='Mask',
-                      help="""Mask file to use for limiting the analysis to a 
-                      defined region and level value to use 
-                      (optional, default: all but zero).""")
-        
+                      help="Mask file to use for limiting the analysis to a "
+                      "defined region and level value to use " 
+                      "(optional, default: all but zero).")
         form.addParam('method', params.BooleanParam, default=True,
                       label='Use Box',
-                      help="""The local (box) and shell (shell) resolution 
-                      calculations are mutually exclusive.""")
-        
+                      help="The local (box) and shell (shell) resolution " 
+                      "calculations are mutually exclusive.")
         form.addParam('box', params.IntParam, default=20,
                       condition = '(method)',
                       label='Box',
-                      help="""Kernel size for determining 
-                      local resolution (pixels/voxels)""")
+                      help="Kernel size for determining "
+                      "local resolution (pixels/voxels).")
         form.addParam('shell', params.IntParam, default=20, 
                       condition ='(not method)',
                       label='Shell',
-                      help="""Shell width for determining 
-                      radial resolution (pixels/voxels).""")
+                      help="Shell width for determining " 
+                      "radial resolution (pixels/voxels).")
         
         line = form.addLine('Resolution Criterion')
         line.addParam('resolutionCriterion', params.EnumParam, 
                       choices=['FSC', 'DPR', 'SSNR', 'RAB'],
                       default=0,
-                      help="""Resolution criterion: 
-                            FSC = Fourier Shell Correlation (default),
-        	                DPR = Differential Phase Residual, 
-        	                SSNR = Spectral Signal-to-Noise Ratio,
-        	                RAB = R(A+B) figure of merit.""")
-
+                      help="Resolution criterion:\n" 
+                           "FSC = Fourier Shell Correlation (default),\n"
+                           "DPR = Differential Phase Residual,\n"
+                           "SSNR = Spectral Signal-to-Noise Ratio,\n"
+                           "RAB = R(A+B) figure of merit.")
         line.addParam('cutoff', params.FloatParam,
                       default=0.5,
                       label='Cutoff',
-                      help="""Resolution cutoff for the criterion chosen
-            	                        (default: FSC: 0.5, DPR: 45, 
-            	                        SSNR: 1, RAB: 0.5).""")
+                      help="Resolution cutoff for the criterion chosen "
+                           "(default: FSC: 0.5, DPR: 45, " 
+                           "SSNR: 1, RAB: 0.5).")
 
         form.addSection(label='Parameters')
         form.addParam('step', params.IntParam, default=1,
                       label='Step',
-                      help="""Interval between voxel samples or shells for 
-                      resolution analysis (pixels, default: 1)""")
+                      help="Interval between voxel samples or shells for " 
+                      "resolution analysis (pixels, default: 1)")
         form.addParam('maxresolution', params.FloatParam, default=2,
                       label='Maximum Resolution',
-                      help="""Maximum frequency available in the data (angstrom)""")
+                      help="Maximum frequency available in the data (angstrom).")
         form.addParam('fill', params.IntParam, allowsNull=True,
                       label='Fill',
-                      help="""Value to fill the background 
-                      (non-masked regions; default 0).
-                          """)
+                      help="Value to fill the background " 
+                      "(non-masked regions; default 0).")
         form.addParam('pad', params.EnumParam, 
                       choices=['None', 'Box', 'Shell'],
                       default=1,
                       label='Padding Factor',
-                      help="""Resolution box padding factor
-                       (0 = none, default: 1 (box) and 0 (shell)).
-                          """)
+                      help="Resolution box padding factor "
+                           "(0 = none, default: 1 (box) and 0 (shell)).")
         form.addParam('symmetry', params.StringParam, allowsNull=True,
                       default='',
                       label='Symmetry',
-                      help="""Point group symmetry.""")
+                      help="Point group symmetry.")
         form.addParam('smooth', params.BooleanParam, default=True,
                       label='Smooth',
-                      help="""Smooth the shell edge.""")
+                      help="Smooth the shell edge.")
 
     def _createFilenameTemplates(self):
         """ Centralize how files are called """
@@ -163,7 +146,7 @@ class BsoftProtBlocres(ProtAnalysis3D):
         self._insertFunctionStep('resolutionStep')
         self._insertFunctionStep('createOutputStep')
 
-    #--------------------------- STEPS functions -------------------------------   
+    #--------------------------- STEPS functions ------------------------------
     def convertInputStep(self):
         # blocres works with .map
         vol1Fn = self.inputVolume.get().getFileName()
@@ -180,7 +163,6 @@ class BsoftProtBlocres(ProtAnalysis3D):
             ImageHandler().convert(maskFn, self.fnmask)     
         else:      
             self.fnmask = self.maks.get().getFileName()
- 
  
     def resolutionStep(self):
         """ blocres parameters. """
@@ -201,7 +183,7 @@ class BsoftProtBlocres(ProtAnalysis3D):
         if self.fill.get() != '':
             params += ' -fill %i' % self.fill.get()
 
-        #Parameters for local resolution
+        # Parameters for local resolution
         params += ' -pad %f' % self.pad.get()
         if self.symmetry.get() !='':
             params += ' -symmetry %s' % self.symmetry.get()
@@ -210,13 +192,11 @@ class BsoftProtBlocres(ProtAnalysis3D):
         if self.mask.get().getFileName() !='':
             params += ' -Mask %s' % self.fnmask
 
-        # Input
         # input halves and output map
         params += ' %s %s %s' % (self.fnvol1, self.fnvol2, 
                                  self._getFileName(FN_RESOLMAP))
 
-        self.runJob('blocres', params)
-
+        self.runJob(bsoft.Plugin.getProgram('blocres'), params)
 
     def createOutputStep(self):
         volume = Volume()
@@ -250,9 +230,9 @@ class BsoftProtBlocres(ProtAnalysis3D):
     
     def _summary(self):
         summary = []
-        summary.append("Highest resolution %.2f Å,   "
-                       "Lowest resolution %.2f Å. \n" % (self.min_res_init,
-                                                         self.max_res_init))
+        summary.append("Highest resolution %.2f A,   "
+                       "Lowest resolution %.2f A." % (self.min_res_init,
+                                                      self.max_res_init))
     
     def _methods(self):
         methods = []

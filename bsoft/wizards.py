@@ -1,9 +1,10 @@
 # **************************************************************************
 # *
-# * Authors:     J.M. De la Rosa Trevin (jmdelarosa@cnb.csic.es)
-# *              Jose Gutierrez (jose.gutierrez@cnb.csic.es)
+# * Authors:     J.M. De la Rosa Trevin (delarosatrevin@scilifelab.se) [1]
+# *              Jose Gutierrez (jose.gutierrez@cnb.csic.es) [2]
 # *
-# * Unidad de  Bioinformatica of Centro Nacional de Biotecnologia , CSIC
+# * [1] SciLifeLab, Stockholm University
+# * [2] Unidad de  Bioinformatica of Centro Nacional de Biotecnologia , CSIC
 # *
 # * This program is free software; you can redistribute it and/or modify
 # * it under the terms of the GNU General Public License as published by
@@ -24,32 +25,29 @@
 # *  e-mail address 'scipion@cnb.csic.es'
 # *
 # **************************************************************************
-"""
-This module implement some wizards
-"""
 
 import os
 
 from pyworkflow.utils.path import cleanPath
 import pyworkflow.gui.dialog as dialog
 from pyworkflow.em.convert import ImageHandler
-from pyworkflow.em.wizard import DownsampleDialog, ImagePreviewDialog, FilterParticlesWizard
+from pyworkflow.em.wizard import (DownsampleDialog, ImagePreviewDialog,
+                                  FilterParticlesWizard)
     
-from protocol_bfilter import BsoftProtBfilter
+from bsoft.protocols import BsoftProtBfilter
 
 
 
-class BsoftFilterParticlesWizard(FilterParticlesWizard):    
+class BsoftFilterParticlesWizard(FilterParticlesWizard):
     _targets = [(BsoftProtBfilter, ['filterType'])]
     
     def _getParameters(self, protocol):
-        
         label, value = self._getInputProtocol(self._targets, protocol)
         
         protParams = {}
-        protParams['input']= protocol.inputParticles
-        protParams['label']= label
-        protParams['value']= value
+        protParams['input'] = protocol.inputParticles
+        protParams['label'] = label
+        protParams['value'] = value
 
         return protParams
     
@@ -67,7 +65,7 @@ class BsoftFilterParticlesWizard(FilterParticlesWizard):
             dialog.showWarning("Input particles", "Select particles first", form.root)  
     
     
-#--------------- Dialogs used by Wizards --------------------------        
+#--------------- Dialogs used by Wizards --------------------------------------
        
 class BsoftFilterDialog(DownsampleDialog):
     
@@ -80,7 +78,7 @@ class BsoftFilterDialog(DownsampleDialog):
         self.rightImage = ImageHandler()._img
         
     def _createControls(self, frame):
-        pass #FIXME
+        pass  # FIXME
 #         self.freqFrame = ttk.LabelFrame(frame, text="Frequencies", padding="5 5 5 5")
 #         self.freqFrame.grid(row=0, column=0)
 #         if self.protocolParent.filterType <= FILTER_SPACE_REAL:
@@ -95,7 +93,8 @@ class BsoftFilterDialog(DownsampleDialog):
         
     def _doPreview(self, e=None):
         if self.lastObj is None:
-            dialog.showError("Empty selection", "Select an item first before preview", self)
+            dialog.showError("Empty selection",
+                             "Select an item first before preview", self)
         else:
             self._computeRightPreview()
     
@@ -106,8 +105,6 @@ class BsoftFilterDialog(DownsampleDialog):
         """ This function should compute the right preview
         using the self.lastObj that was selected
         """
-        from pyworkflow.em.packages.xmipp3 import locationToXmipp
-        
         # Copy image to filter to Tmp project folder
         inputPath = os.path.join("Tmp", "bsoft_filter_input.spi")
         outputPath = os.path.join("Tmp", "bsoft_filter_output.spi")
@@ -123,4 +120,3 @@ class BsoftFilterDialog(DownsampleDialog):
         img.read(outputPath)
         self.rightImage = img
         self.updateFilteredImage()
-

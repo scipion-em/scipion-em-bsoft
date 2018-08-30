@@ -1,9 +1,9 @@
 # coding: latin-1
 # **************************************************************************
 # *
-# * Authors:     J.M. De la Rosa Trevin (jmdelarosa@cnb.csic.es)
+# * Authors:     J.M. De la Rosa Trevin (delarosatrevin@scilifelab.se)
 # *
-# * Unidad de  Bioinformatica of Centro Nacional de Biotecnologia , CSIC
+# * SciLifeLab, Stockholm University
 # *
 # * This program is free software; you can redistribute it and/or modify
 # * it under the terms of the GNU General Public License as published by
@@ -24,11 +24,8 @@
 # *  e-mail address 'scipion@cnb.csic.es'
 # *
 # **************************************************************************
-"""
-Bibtex string file for Xmipp package.
-"""
 
-_bibtexStr = """
+"""
 @article{Heymann2007,
 title = "Bsoft: Image processing and molecular modeling for electron microscopy ",
 journal = "Journal of Structural Biology ",
@@ -42,10 +39,18 @@ url = "http://www.sciencedirect.com/science/article/pii/S1047847706001997",
 author = "J. Bernard Heymann and David M. Belnap",
 keywords = "Single particle analysis Tomography",
 }
+
+@article{Cardone2013,
+title = "One number does not fit all: mapping local variations in resolution in cryo-EM reconstructions",
+journal = "Journal of Structural Biology",
+volume = "184",
+number = "2",
+pages = "226 - 236",
+year = "2013",
+issue = "2",
+doi = "http://dx.doi.org/10.1016/j.jsb.2013.08.002",
+url = "http://www.sciencedirect.com/science/article/pii/S1047847713002086",
+author = "Giovanni Cardone and Bernard Heymann and Alasdair Steven",
+}
+
 """
-
-
-
-from pyworkflow.utils import parseBibTex
-
-_bibtex = parseBibTex(_bibtexStr)  

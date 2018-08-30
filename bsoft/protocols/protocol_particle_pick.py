@@ -1,9 +1,10 @@
 # **************************************************************************
 # *
-# * Authors:     Jose Gutierrez Tabuenca (jose.gutierrez@cnb.csic.es)
-# *              J.M. De la Rosa Trevin (jmdelarosa@cnb.csic.es)
+# * Authors:     Jose Gutierrez Tabuenca (jose.gutierrez@cnb.csic.es) [1]
+# *              J.M. De la Rosa Trevin (delarosatrevin@scilifelab.se) [2]
 # *
-# * Unidad de  Bioinformatica of Centro Nacional de Biotecnologia , CSIC
+# * [1] Unidad de  Bioinformatica of Centro Nacional de Biotecnologia , CSIC
+# * [2] SciLifeLab, Stockholm University
 # *
 # * This program is free software; you can redistribute it and/or modify
 # * it under the terms of the GNU General Public License as published by
@@ -25,17 +26,18 @@
 # *
 # **************************************************************************
 
-from pyworkflow.em import *  
-from pyworkflow.utils.path import *  
-from convert import readSetOfCoordinates
-from posixpath import abspath
-import bsoft
+from os.path import abspath, basename
+
+from pyworkflow.em.protocol import ProtParticlePicking
+from pyworkflow.protocol.params import FloatParam
+from pyworkflow.utils.properties import Message
 from pyworkflow.gui.dialog import askYesNo
-from convert import readSetOfCoordinates
+
+import bsoft
+from bsoft.convert import readSetOfCoordinates
 
 
 class BsoftProtParticlePicking(ProtParticlePicking):
-
     """Protocol to pick particles in a set of micrographs using bsoft"""
     _label = 'particle picking'
 
@@ -44,24 +46,21 @@ class BsoftProtParticlePicking(ProtParticlePicking):
         # The following attribute is only for testing
         
     def _defineParams(self, form):
-    
         ProtParticlePicking._defineParams(self, form)
         form.addParam('memory', FloatParam, default=2,
                    label='Memory to use (In Gb)', expertLevel=2)    
         
     def _insertAllSteps(self):
         """The Particle Picking process is realized for a set of micrographs"""
-        
-        # Get pointer to input micrographs 
+        # Get pointer to input micrographs
         self.inputMics = self.inputMicrographs.get()
         # Launch Particle Picking GUI
-        self._insertFunctionStep('launchParticlePickGUIStep', interactive=True)
+        self._insertFunctionStep('launchParticlePickGUIStep',
+                                 interactive=True)
         # Insert step to create output objects       
         #self._insertFunctionStep('createOutputStep')
         
-        
     def launchParticlePickGUIStep(self):
-        
         # Launch the particle picking GUI
         outputdir = self._getExtraPath()
         for mic in self.inputMics:
@@ -70,22 +69,15 @@ class BsoftProtParticlePicking(ProtParticlePicking):
             self.runJob("ln -sf", args)
             
         self._enterDir(outputdir)
-        bsoft.loadEnvironment()
         for mic in self.inputMics:
-            self.runJob("bshow", basename(mic.getFileName()))
-
+            self.runJob(bsoft.Plugin.getProgram('bshow'), basename(mic.getFileName()),
+                        env=bsoft.Plugin.getEnviron())
 
         # Open dialog to request confirmation to create output
-        if askYesNo(Message.TITLE_SAVE_OUTPUT, Message.LABEL_SAVE_OUTPUT, None):
-            self._leaveDir()# going back to project dir
+        if askYesNo(Message.TITLE_SAVE_OUTPUT,
+                    Message.LABEL_SAVE_OUTPUT, None):
+            self._leaveDir() # going back to project dir
             self._createOutput(outputdir)
-   
-#    def createOutputStep(self):
-#        outputDir = self._getExtraPath()
-#        coordSet = self._createSetOfCoordinates(self.inputMics)
-#        readSetOfCoordinates(outputDir, self.inputMics, coordSet)
-#        self._defineOutputs(outputCoordinates=coordSet)
-#        self._defineSourceRelation(self.inputMics, coordSet)
 
     def readSetOfCoordinates(self, workingDir, coordSet):
         readSetOfCoordinates(workingDir, self.inputMics, coordSet)
@@ -98,12 +90,9 @@ class BsoftProtParticlePicking(ProtParticlePicking):
 
     def __str__(self):
         """ String representation of a Supervised Picking run """
-    
         if not hasattr(self, 'outputCoordinates'):
             picked = 0
         else:
             picked = self.outputCoordinates.getSize()
-        return  "Particles picked: %d (from %d micrographs)" % (picked, self.inputMicrographs.get().getSize())
-    
-  
-
+        return "Particles picked: %d (from %d micrographs)" % (
+            picked, self.inputMicrographs.get().getSize())

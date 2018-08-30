@@ -1,8 +1,8 @@
 # **************************************************************************
 # *
-# * Authors:     J.M. De la Rosa Trevin (jmdelarosa@cnb.csic.es)
+# * Authors:     J.M. De la Rosa Trevin (delarosatrevin@scilifelab.se)
 # *
-# * Unidad de  Bioinformatica of Centro Nacional de Biotecnologia , CSIC
+# * SciLifeLab, Stockholm University
 # *
 # * This program is free software; you can redistribute it and/or modify
 # * it under the terms of the GNU General Public License as published by
@@ -24,29 +24,26 @@
 # *
 # **************************************************************************
 
+from matplotlib import cm
 
-from pyworkflow.em.viewer import CommandView, Viewer, DESKTOP_TKINTER
-from pyworkflow.protocol.params import (LabelParam, StringParam, EnumParam,
-                                        IntParam, LEVEL_ADVANCED)
-from pyworkflow.viewer import ProtocolViewer
-from pyworkflow.em.constants import (COLOR_CHOICES, COLOR_OTHER, COLOR_JET, 
-                                     COLOR_TERRAIN, COLOR_GIST_EARTH, 
+from pyworkflow.em import ImageHandler, ChimeraView
+from pyworkflow.em.constants import (COLOR_CHOICES, COLOR_OTHER,
+                                     COLOR_JET, COLOR_TERRAIN, COLOR_GIST_EARTH,
                                      COLOR_GIST_NCAR, COLOR_GNU_PLOT,
                                       COLOR_GNU_PLOT2, AX_X, AX_Y, AX_Z)
-from pyworkflow.gui.plotter import Plotter
-from pyworkflow.em.plotter import EmPlotter
-from pyworkflow.em import ImageHandler, ChimeraView
 from pyworkflow.em.data import Volume
-#import numpy as np
-#import matplotlib.pyplot as plt
-from matplotlib import cm
-from convert import getEnviron
-from pyworkflow.em.viewer import DataView, LocalResolutionViewer
-from protocol_blocres import BsoftProtBlocres, FN_RESOLMAP, FN_HALF1
+from pyworkflow.em.plotter import EmPlotter
+from pyworkflow.em.viewer import (DataView, LocalResolutionViewer,
+                                  CommandView, Viewer, DESKTOP_TKINTER)
+from pyworkflow.protocol.params import (LabelParam, StringParam,
+                                        EnumParam, IntParam, LEVEL_ADVANCED)
+from pyworkflow.viewer import ProtocolViewer
+
+import bsoft
+from bsoft.protocols import BsoftProtBlocres
+from bsoft.constants import FN_RESOLMAP, FN_HALF1
 
 
-#------------------------ Some views and  viewers ------------------------
-        
 
 class BsoftVolumeView(CommandView):
     def __init__(self, inputFile, **kwargs):
@@ -56,7 +53,7 @@ class BsoftVolumeView(CommandView):
             inputFile += ":spi"
 
         CommandView.__init__(self, 'bshow "%s" &' % inputFile,
-                             env=getEnviron(), **kwargs)
+                             env=bsoft.Plugin.getEnviron(), **kwargs)
 
              
 class BsoftViewer(Viewer):
@@ -72,12 +69,15 @@ class BsoftViewer(Viewer):
         fn = obj.getFileName()
         BsoftVolumeView(fn).show()
 
+
 class BsoftPlotter(EmPlotter):
     """ Class to create several plots with Bsoft utilities"""
     def __init__(self, x=1, y=1, mainTitle="", **kwargs):
         EmPlotter.__init__(self, x, y, mainTitle, **kwargs)
- 
+
+
 binaryCondition = ('(colorMap == %d) ' % (COLOR_OTHER))
+
 
 class BsoftViewerBlocres(LocalResolutionViewer):
     """
@@ -150,12 +150,10 @@ class BsoftViewerBlocres(LocalResolutionViewer):
         
         return [out_cm]
 
-
     def _showOriginalVolumeSlices(self, param=None):
         out_cm = DataView(self.protocol.inputVolume.get().getFileName())
 
         return [out_cm]
-
 
     def _showVolumeColorSlices(self, param=None):
         imageFile = self.protocol._getFileName(FN_RESOLMAP)
@@ -175,7 +173,6 @@ class BsoftViewerBlocres(LocalResolutionViewer):
                                        interpolation="nearest")
         xplotter.getColorBar(plot)
         return [xplotter]
-
 
     def _showOneColorslice(self, param=None):
         imageFile = self.protocol._getFileName(FN_RESOLMAP)
@@ -199,7 +196,6 @@ class BsoftViewerBlocres(LocalResolutionViewer):
         xplotter.getColorBar(plot)
         return [xplotter]
 
-
     def _plotHistogram(self, param=None):
         imageFile = self.protocol._getFileName(FN_RESOLMAP)
         img = ImageHandler().read(imageFile)
@@ -212,8 +208,7 @@ class BsoftViewerBlocres(LocalResolutionViewer):
                               "Resolution (A)", "# of Counts")
         fig = plotter.plotHist(imgListNoZero, nbins)
         return [plotter]
-    
-    
+
     def _showChimera(self, param=None):
         fnResVol = self.protocol._getFileName(FN_RESOLMAP)
         fnOrigMap = self.protocol._getFileName(FN_HALF1)
@@ -222,11 +217,9 @@ class BsoftViewerBlocres(LocalResolutionViewer):
         self.createChimeraScript(cmdFile, fnResVol, fnOrigMap, sampRate)
         view = ChimeraView(cmdFile)
         return [view]
-        
 
     def _getAxis(self):
         return self.getEnumText('sliceAxis')
-
     
     def getColorMap(self):
         if (COLOR_CHOICES[self.colorMap.get()] is 'other'): 
@@ -236,8 +229,3 @@ class BsoftViewerBlocres(LocalResolutionViewer):
         if cmap is None:
             cmap = cm.jet
         return cmap
-
-
-
-
-

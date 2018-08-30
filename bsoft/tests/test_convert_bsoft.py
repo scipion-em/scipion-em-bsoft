@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # **************************************************************************
 # *
 # * Authors:   Roberto Marabini       (roberto@cnb.csic.es)
@@ -26,11 +25,19 @@
 # **************************************************************************
 
 import os
-from pyworkflow.em.data import SetOfVolumes
-from pyworkflow.em.packages.bsoft import bsoft
-import unittest
+import subprocess
 
-###############COMANDS
+from pyworkflow.em.data import SetOfVolumes
+import xmipp
+from xmipp3 import *
+from bsoft import *
+from pyworkflow.tests import *
+from pyworkflow.em.packages.xmipp3.convert import *
+from pyworkflow.utils.properties import colorText
+
+import bsoft
+
+###############COMMANDS
 #CTF
 #bhead -ver 7 -images delta.mrc delta.mrc
 #bctf -ver 7 -act apply -out ctf_app.emx ctf.emx
@@ -42,13 +49,7 @@ import unittest
 #bhead -verbose 7 -images ./stack2D.mrc ./stack2D.mrc
 #3) breconstruct -verb 7  -rec rec2.mrc -out rec.emx stack2D.emx
 
-import xmipp
-from pyworkflow.em.packages.xmipp3 import *
-from pyworkflow.em.packages.bsoft import *
-from pyworkflow.tests import *
-from pyworkflow.em.packages.xmipp3.convert import *
-import subprocess
-from pyworkflow.utils.properties import colorText
+
 
 # ======== Test are not working ===============
 # Remove the following class in order to re-active
@@ -884,4 +885,3 @@ class TestSetConvert(BaseTest):
         writeSetOfDefocusGroups(setOfDefocus, fnXmipp)
         mdAux = xmipp.MetaData(fnXmipp)
         self.assertEqual(md,mdAux, "test writeSetOfDefocusGroups fails")
-       
