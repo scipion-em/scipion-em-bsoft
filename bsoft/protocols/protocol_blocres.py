@@ -196,7 +196,8 @@ class BsoftProtBlocres(ProtAnalysis3D):
         params += ' %s %s %s' % (self.fnvol1, self.fnvol2, 
                                  self._getFileName(FN_RESOLMAP))
 
-        self.runJob(bsoft.Plugin.getProgram('blocres'), params)
+        self.runJob(bsoft.Plugin.getProgram('blocres'), params,
+                    env=bsoft.Plugin.getEnviron())
 
     def createOutputStep(self):
         volume = Volume()

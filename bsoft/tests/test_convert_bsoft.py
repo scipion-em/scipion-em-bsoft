@@ -28,14 +28,13 @@ import os
 import subprocess
 
 from pyworkflow.em.data import SetOfVolumes
-import xmipp
-from xmipp3 import *
-from bsoft import *
 from pyworkflow.tests import *
-from pyworkflow.em.packages.xmipp3.convert import *
 from pyworkflow.utils.properties import colorText
 
-import bsoft
+import xmipp3
+from xmipp3 import *
+from bsoft import *
+from xmipp3.convert import *
 
 ###############COMMANDS
 #CTF

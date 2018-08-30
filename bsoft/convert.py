@@ -32,21 +32,6 @@ from pyworkflow.utils.path import join, dirname, replaceBaseExt, createLink, exi
 from constants import *
 
 
-
-def addBsoftLabelAliases():
-    for k, v in XMIPP_BSOFT_LABELS.iteritems():
-        md.addLabelAlias(k, v, True)
-
-
-_xmippLabelsDict = {}  # Dictionary to store mappings replaced
-
-
-def restoreXmippLabels():
-    global _xmippLabelsDict
-    for k, v in _xmippLabelsDict.iteritems():
-        md.addLabelAlias(k, v, True)
-    _xmippLabelsDict = {}
-
         
 def readSetOfCoordinates(outputDir, micSet, coordSet):
     """ Read from Bsoft .star files.
@@ -57,25 +42,24 @@ def readSetOfCoordinates(outputDir, micSet, coordSet):
             name should be the same of the micrographs.
         coordSet: the SetOfCoordinates that will be populated.
     """
-    addBsoftLabelAliases()
-    boxSize = 0
+    boxSize = 100
     for mic in micSet:
         outputFile = join(outputDir, replaceBaseExt(mic.getFileName(), 'star'))
         if exists(outputFile):
             posMd = md.MetaData(outputFile)
+
             for objId in posMd:
-                coord = rowToCoordinate(rowFromMd(posMd, objId))
-                boxSize = 2 * posMd.getValue(md.MDL_PICKING_PARTICLE_SIZE, objId)
+                coordRow = rowFromMd(posMd, objId)
+                coord = rowToCoordinate(coordRow)
+                boxSize = 2 * float(coordRow.getValue(md.BSOFT_PARTICLE_ORIGIN_X, 50))
                 coord.setMicrograph(mic)
                 coord.setX(coord.getX())
                 coord.setY(coord.getY())
                 
                 coordSet.append(coord)      
                 # Add an unique ID that will be propagated to particles
-                posMd.setValue(md.MDL_ITEM_ID, long(coord.getObjId()), objId)
-#         if not posMd.isEmpty():
-#             posMd.write("particles@%s"  % scipionPosFile)
-            
+                #posMd.setValue(md.MDL_PARTICLE_ID, long(coord.getObjId()), objId)
+
     # reading origin.x value and converting to particle
     # size, can change, we take last value
     coordSet.setBoxSize(boxSize)
@@ -86,13 +70,9 @@ def rowToCoordinate(coordRow):
     # Check that all required labels are present in the row
     if _containsAll(coordRow, COOR_DICT):
         coord = Coordinate()
-        rowToObject(coordRow, coord, COOR_DICT, extraLabels=COOR_EXTRA_LABELS)
-
-        # Setup the micId if is integer value
-        try:
-            coord.setMicId(int(coordRow.getValue(md.MDL_MICROGRAPH_ID)))
-        except Exception:
-            pass
+        rowToObject(coordRow, coord, COOR_DICT)#, extraLabels=COOR_EXTRA_LABELS)
+        # TODO: switch back on extra labels when
+        # sqlite mapper can tolerate dots in label names
     else:
         coord = None
 
@@ -100,19 +80,19 @@ def rowToCoordinate(coordRow):
 
 
 def rowToObject(row, obj, attrDict, extraLabels=[]):
-    """ This function will convert from a XmippMdRow to an EMObject.
+    """ This function will convert from a md Row to an EMObject.
     Params:
-        row: the XmippMdRow instance (input)
+        row: the Row instance (input)
         obj: the EMObject instance (output)
         attrDict: dictionary with the map between obj attributes(keys) and
-            row MDLabels in Xmipp (values).
-        extraLabels: a list with extra labels that could be included
-            as _xmipp_labelName
+            row MDLabels in Bsoft (values).
     """
-    obj.setEnabled(row.getValue(md.MDL_ENABLED, 1) > 0)
+    # Bsoft does not have analogous label for MDL_ENABLED
+    obj.setEnabled(True)
 
     for attr, label in attrDict.iteritems():
-        value = row.getValue(label)
+        # all Bsoft labels are strings, so convert to float
+        value = float(row.getValue(label))
         if not hasattr(obj, attr):
             setattr(obj, attr, ObjectWrap(value))
         else:
@@ -123,7 +103,7 @@ def rowToObject(row, obj, attrDict, extraLabels=[]):
     for label in extraLabels:
         if label not in attrLabels and row.hasLabel(label):
             labelStr = md.label2Str(label)
-            setattr(obj, '_xmipp_%s' % labelStr, row.getValueAsObject(label))
+            setattr(obj, '_' + labelStr, row.getValueAsObject(label))
 
 
 def rowFromMd(mdata, objId):
@@ -146,15 +126,13 @@ def writeSetOfParticles(imgSet, starFile, stackFile):
         imgSet: the SetOfImages instance.
         starFile: the filename where to write the metadata.
     """
-    addBsoftLabelAliases()
     mdata = md.MetaData()
     mdata.setColumnFormat(False)
     imgRow = mdata.Row()
-    imgRow.setValue(md.MDL_MICROGRAPH_ID, long(1))
-    imgRow.setValue(md.MDL_IMAGE, str(stackFile))
+    imgRow.setValue(md.BSOFT_MICROGRAPH_ID, long(1))
+    imgRow.setValue(md.BSOFT_PARTICLE_FILE, str(stackFile))
     imgRow.writeToMd(mdata, mdata.addObject())
     imgSet._bsoftStar = String(starFile)
-    restoreXmippLabels()
 
 
 def createBsoftInputParticles(imgSet, starFile, stackFile): 

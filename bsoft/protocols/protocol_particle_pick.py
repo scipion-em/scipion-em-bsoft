@@ -48,7 +48,7 @@ class BsoftProtParticlePicking(ProtParticlePicking):
     def _defineParams(self, form):
         ProtParticlePicking._defineParams(self, form)
         form.addParam('memory', FloatParam, default=2,
-                   label='Memory to use (In Gb)', expertLevel=2)    
+                      label='Memory to use (In Gb)', expertLevel=2)
         
     def _insertAllSteps(self):
         """The Particle Picking process is realized for a set of micrographs"""
@@ -57,9 +57,7 @@ class BsoftProtParticlePicking(ProtParticlePicking):
         # Launch Particle Picking GUI
         self._insertFunctionStep('launchParticlePickGUIStep',
                                  interactive=True)
-        # Insert step to create output objects       
-        #self._insertFunctionStep('createOutputStep')
-        
+
     def launchParticlePickGUIStep(self):
         # Launch the particle picking GUI
         outputdir = self._getExtraPath()

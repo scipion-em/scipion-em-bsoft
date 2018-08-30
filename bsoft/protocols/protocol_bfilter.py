@@ -149,7 +149,8 @@ class BsoftProtBfilter(em.ProtFilterParticles):
         args = self.getFilterArgs()
 
         self.runJob(bsoft.Plugin.getProgram('bfilter'), args +
-                    ' %s %s' % (inputStk, outputStk))
+                    ' %s %s' % (inputStk, outputStk),
+                    env=bsoft.Plugin.getEnviron())
         
     def filterStep(self, args):
         """ Apply the selected filter to particles. 
@@ -157,7 +158,9 @@ class BsoftProtBfilter(em.ProtFilterParticles):
         """
         particlesStk = self._getPath('particles.spi')
         tmpStk = particlesStk.replace('.spi', '_tmp.spi')
-        self.runJob('bfilter', args + ' %s %s' % (particlesStk, tmpStk))
+        self.runJob(bsoft.Plugin.getProgram('bfilter'), args +
+                    ' %s %s' % (particlesStk, tmpStk),
+                    env=bsoft.Plugin.getEnviron())
         pwutils.moveFile(tmpStk, particlesStk.replace('.spi', '.stk'))
         # just we prefer stk as stack of spider images
         pwutils.cleanPath(particlesStk)

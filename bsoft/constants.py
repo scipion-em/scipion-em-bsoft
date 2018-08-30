@@ -44,31 +44,33 @@ FN_MASKVOL = 'maskvol'
 FN_RESOLMAP = 'resolutionMap'
 
 
-# Map from Xmipp labels to Bsoft labels names
-XMIPP_BSOFT_LABELS = {
-    md.MDL_MICROGRAPH: 'micrograph.file_name',
-    md.MDL_MICROGRAPH_ID: 'micrograph.id',
-    md.MDL_IMAGE: 'particle.filename',
-    md.MDL_PARTICLE_ID: 'particle.id',
-    md.MDL_XCOOR: 'particle.x',
-    md.MDL_YCOOR: 'particle.y',
-    md.MDL_ZCOOR: 'particle.z',
-    md.MDL_SHIFT_X: 'particle.origin_x',
-    md.MDL_SHIFT_Y: 'particle.origin_y',
-    md.MDL_SHIFT_Z: 'particle.origin_z',
-    md.MDL_ENABLED: 'particle.select',
-    md.MDL_PICKING_PARTICLE_SIZE: 'particle.origin_x',
-    md.MDL_MAGNIFICATION: 'particle.magnification'
-}
+BSOFT_LABELS = [
+    md.BSOFT_MICROGRAPH_FILE,
+    md.BSOFT_MICROGRAPH_ID,
+
+    md.BSOFT_PARTICLE_ID,
+    md.BSOFT_PARTICLE_GROUP,
+    md.BSOFT_PARTICLE_MAGNIF,
+    md.BSOFT_PARTICLE_X,
+    md.BSOFT_PARTICLE_Y,
+    md.BSOFT_PARTICLE_Z,
+    md.BSOFT_PARTICLE_ORIGIN_X,
+    md.BSOFT_PARTICLE_ORIGIN_Y,
+    md.BSOFT_PARTICLE_ORIGIN_Z,
+    md.BSOFT_PARTICLE_VIEW_X,
+    md.BSOFT_PARTICLE_VIEW_Y,
+    md.BSOFT_PARTICLE_VIEW_Z,
+    md.BSOFT_PARTICLE_VIEW_ANGLE,
+    md.BSOFT_PARTICLE_FOM,
+    md.BSOFT_PARTICLE_SELECT
+]
 
 COOR_DICT = OrderedDict([
-             ("_x", md.MDL_XCOOR),
-             ("_y", md.MDL_YCOOR)
+             ("_x", md.BSOFT_PARTICLE_X),
+             ("_y", md.BSOFT_PARTICLE_Y)
              ])
 
 COOR_EXTRA_LABELS = [
-    # Additional autopicking-related metadata
-    md.RLN_PARTICLE_AUTOPICK_FOM,
-    md.RLN_PARTICLE_CLASS,
-    md.RLN_ORIENT_PSI
-    ]
+    md.BSOFT_PARTICLE_FOM,
+    md.BSOFT_PARTICLE_SELECT
+]
