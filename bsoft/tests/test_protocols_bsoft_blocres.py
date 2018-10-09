@@ -30,7 +30,6 @@ from pyworkflow.em.protocol import ProtImportVolumes, ProtImportMask
 from bsoft.protocols import BsoftProtBlocres
 
 
-
 class TestBsoftBlocresBase(BaseTest):
     @classmethod
     def setData(cls, dataProject='resmap'):

@@ -29,7 +29,7 @@ from pyworkflow.em.data import Coordinate
 from pyworkflow.object import String, ObjectWrap
 from pyworkflow.utils.path import join, dirname, replaceBaseExt, createLink, exists
 
-from constants import *
+from bsoft.constants import *
 
 
         
