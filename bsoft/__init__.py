@@ -29,7 +29,7 @@ import os
 import pyworkflow.em
 from pyworkflow.utils import Environ
 
-from constants import BSOFT_HOME
+from bsoft.constants import BSOFT_HOME, V1_9_0
 
 _logo = "bsoft_logo.png"
 _references = ['Heymann2007']
@@ -38,7 +38,7 @@ _references = ['Heymann2007']
 class Plugin(pyworkflow.em.Plugin):
     _homeVar = BSOFT_HOME
     _pathVars = [BSOFT_HOME]
-    _supportedVersions = ['1.9.0']
+    _supportedVersions = [V1_9_0]
 
     @classmethod
     def _defineVariables(cls):
@@ -50,18 +50,25 @@ class Plugin(pyworkflow.em.Plugin):
         environ = Environ(os.environ)
         pos = Environ.BEGIN if xmippFirst else Environ.END
         environ.update({
-            'PATH': os.path.join(os.environ[BSOFT_HOME], 'bin'),
-            'BSOFT': os.environ[BSOFT_HOME]
+            'PATH': os.path.join(Plugin.getHome(), 'bin'),
+            'BSOFT': Plugin.getHome()
         }, position=pos)
         return environ
 
     @classmethod
     def getProgram(cls, program):
         """ Return the program binary that will be used. """
-        if BSOFT_HOME not in os.environ:
-            return None
         cmd = cls.getHome('bin', program)
         return str(cmd)
+
+    @classmethod
+    def defineBinaries(cls, env):
+        env.addPackage('bsoft', version='1.8.8',
+                       tar='bsoft1_8_8_Fedora_12.tgz')
+
+        env.addPackage('bsoft', version='1.9.0',
+                       tar='bsoft1_9_0_Fedora_20.tgz',
+                       default=True)
 
 
 pyworkflow.em.Domain.registerPlugin(__name__)

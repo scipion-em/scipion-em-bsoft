@@ -30,6 +30,9 @@ import pyworkflow.em.metadata as md
 
 BSOFT_HOME = 'BSOFT_HOME'
 
+# Supported Versions
+V1_9_0 = '1.9.0'
+
 # Bfilter constants
 FILTER_MEDIAN = 0
 FILTER_PEAK = 1
