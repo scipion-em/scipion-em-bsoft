@@ -37,7 +37,7 @@ _references = ['Heymann2007']
 
 class Plugin(pyworkflow.em.Plugin):
     _homeVar = BSOFT_HOME
-    _pathVars = []
+    _pathVars = [BSOFT_HOME]
     _supportedVersions = [V1_9_0]
 
     @classmethod
