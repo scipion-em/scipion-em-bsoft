@@ -1,32 +1,3 @@
-#### C++
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.os
-
-### Python binaries
-*.pyc
-*.pyo
-
-# Compiled Dynamic libraries
-*.so
-*.dylib
-
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-
-#unused submodule
-.gitmodules
-
-#### Java
-*.class
-
-#### Python
-*.pyc
-
 #### Eclipse and so on
 .project
 .cproject
@@ -34,13 +5,12 @@
 .classpath
 .idea
 
-# Scons auxiliary files
-.sconsign.dblite
-
-# Other
-gmon.out
+#### Python
+build/
+dist/
+*.egg-info/
+*.egg
+*.py[cod]
+__pycache__/
+*.so
 *~
-\#*
-.\#*
-.directory
-
