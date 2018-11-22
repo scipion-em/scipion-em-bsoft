@@ -26,18 +26,18 @@
 
 from matplotlib import cm
 
-from pyworkflow.em import ImageHandler, ChimeraView
+from pyworkflow.em.convert import ImageHandler
 from pyworkflow.em.constants import (COLOR_CHOICES, COLOR_OTHER,
                                      COLOR_JET, COLOR_TERRAIN, COLOR_GIST_EARTH,
                                      COLOR_GIST_NCAR, COLOR_GNU_PLOT,
                                       COLOR_GNU_PLOT2, AX_X, AX_Y, AX_Z)
 from pyworkflow.em.data import Volume
-from pyworkflow.em.plotter import EmPlotter
-from pyworkflow.em.viewer import (DataView, LocalResolutionViewer,
-                                  CommandView, Viewer, DESKTOP_TKINTER)
+from pyworkflow.em.viewers import (ChimeraView, EmPlotter, DataView,
+                                  LocalResolutionViewer, CommandView, Viewer)
 from pyworkflow.protocol.params import (LabelParam, StringParam,
-                                        EnumParam, IntParam, LEVEL_ADVANCED)
-from pyworkflow.viewer import ProtocolViewer
+                                        EnumParam, IntParam)
+from pyworkflow.protocol.constants import LEVEL_ADVANCED
+from pyworkflow.viewer import ProtocolViewer, DESKTOP_TKINTER
 
 import bsoft
 from bsoft.protocols import BsoftProtBlocres
