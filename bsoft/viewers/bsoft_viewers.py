@@ -33,7 +33,8 @@ from pyworkflow.em.constants import (COLOR_CHOICES, COLOR_OTHER,
                                       COLOR_GNU_PLOT2, AX_X, AX_Y, AX_Z)
 from pyworkflow.em.data import Volume
 from pyworkflow.em.viewers import (ChimeraView, EmPlotter, DataView,
-                                  LocalResolutionViewer, CommandView, Viewer)
+                                  LocalResolutionViewer)
+from pyworkflow.viewer import CommandView, Viewer
 from pyworkflow.protocol.params import (LabelParam, StringParam,
                                         EnumParam, IntParam)
 from pyworkflow.protocol.constants import LEVEL_ADVANCED
