@@ -32,7 +32,6 @@ from pyworkflow.utils.path import join, dirname, replaceBaseExt, createLink, exi
 from bsoft.constants import *
 
 
-        
 def readSetOfCoordinates(outputDir, micSet, coordSet):
     """ Read from Bsoft .star files.
     Params:

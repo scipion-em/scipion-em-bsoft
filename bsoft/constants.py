@@ -47,33 +47,8 @@ FN_MASKVOL = 'maskvol'
 FN_RESOLMAP = 'resolutionMap'
 
 
-BSOFT_LABELS = [
-    md.BSOFT_MICROGRAPH_FILE,
-    md.BSOFT_MICROGRAPH_ID,
-
-    md.BSOFT_PARTICLE_ID,
-    md.BSOFT_PARTICLE_GROUP,
-    md.BSOFT_PARTICLE_MAGNIF,
-    md.BSOFT_PARTICLE_X,
-    md.BSOFT_PARTICLE_Y,
-    md.BSOFT_PARTICLE_Z,
-    md.BSOFT_PARTICLE_ORIGIN_X,
-    md.BSOFT_PARTICLE_ORIGIN_Y,
-    md.BSOFT_PARTICLE_ORIGIN_Z,
-    md.BSOFT_PARTICLE_VIEW_X,
-    md.BSOFT_PARTICLE_VIEW_Y,
-    md.BSOFT_PARTICLE_VIEW_Z,
-    md.BSOFT_PARTICLE_VIEW_ANGLE,
-    md.BSOFT_PARTICLE_FOM,
-    md.BSOFT_PARTICLE_SELECT
-]
-
 COOR_DICT = OrderedDict([
-             ("_x", md.BSOFT_PARTICLE_X),
-             ("_y", md.BSOFT_PARTICLE_Y)
+             ("_x", "particle.x"),
+             ("_y", "particle.y")
              ])
 
-COOR_EXTRA_LABELS = [
-    md.BSOFT_PARTICLE_FOM,
-    md.BSOFT_PARTICLE_SELECT
-]
