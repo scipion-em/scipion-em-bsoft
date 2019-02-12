@@ -50,7 +50,7 @@ def readSetOfCoordinates(outputDir, micSet, coordSet):
             for objId in posMd:
                 coordRow = rowFromMd(posMd, objId)
                 coord = rowToCoordinate(coordRow)
-                boxSize = 2 * float(coordRow.getValue(md.BSOFT_PARTICLE_ORIGIN_X, 50))
+                boxSize = 2 * float(coordRow.getValue("particle.x_origin", 50))
                 coord.setMicrograph(mic)
                 coord.setX(coord.getX())
                 coord.setY(coord.getY())
@@ -128,8 +128,8 @@ def writeSetOfParticles(imgSet, starFile, stackFile):
     mdata = md.MetaData()
     mdata.setColumnFormat(False)
     imgRow = mdata.Row()
-    imgRow.setValue(md.BSOFT_MICROGRAPH_ID, long(1))
-    imgRow.setValue(md.BSOFT_PARTICLE_FILE, str(stackFile))
+    imgRow.setValue("micrograph.id", long(1))
+    imgRow.setValue("particle.x_origin", str(stackFile))
     imgRow.writeToMd(mdata, mdata.addObject())
     imgSet._bsoftStar = String(starFile)
 
