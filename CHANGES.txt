@@ -1,3 +1,4 @@
+14-February-2019 - Prepare beta for release
 29/11/2018 Update imports
 09-September-2018 - Add a pip modules files
 23-August-2018 - Validate installation, use Plugin.getHome()
