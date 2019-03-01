@@ -1,3 +1,4 @@
+1-March-2019 - Include protocol.conf to create the source distribution
 14-February-2019 - Prepare beta for release
 29/11/2018 Update imports
 09-September-2018 - Add a pip modules files
