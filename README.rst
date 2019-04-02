@@ -2,7 +2,7 @@
 Bsoft plugin
 ============
 
-This plugin allows to use [**Bsoft**](https://lsbr.niams.nih.gov/bsoft/) within the Scipion framework.
+This plugin allows to use **Bsoft**(https://lsbr.niams.nih.gov/bsoft/) within the Scipion framework.
 
 =====
 Setup
