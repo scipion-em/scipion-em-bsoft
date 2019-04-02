@@ -22,7 +22,7 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
 
 setup(
     name='scipion-em-bsoft',  # Required
-    version='1.0.2b',  # Required
+    version='1.0.3',  # Required
     description='Bsoft ready to use in scipion.',  # Required
     long_description=long_description,  # Optional
     url='https://github.com/scipion-em/scipion-em-bsoft',  # Optional
