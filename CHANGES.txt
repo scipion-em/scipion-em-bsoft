@@ -1,3 +1,4 @@
+2-April-2019 - Modify the README file
 1-March-2019 - Include protocol.conf to create the source distribution
 14-February-2019 - Prepare beta for release
 29/11/2018 Update imports
