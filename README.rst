@@ -10,11 +10,13 @@ Setup
 
 - **Install this plugin:**
 
-.. code-block:: scipion installp -p scipion-em-bsoft
+Using the command line:
 
-OR
+.. code-block:: 
 
-  through the plugin manager GUI by launching Scipion and following **Configuration** >> **Plugins**
+    scipion installp -p scipion-em-bsoft
+
+or trough the plugin manager GUI by launching Scipion and following **Configuration** >> **Plugins**
 
 Alternatively, in devel mode:
 
