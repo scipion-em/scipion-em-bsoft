@@ -26,7 +26,7 @@
 
 import os
 
-import pyworkflow.em
+import pwem
 from pyworkflow.utils import Environ
 
 from bsoft.constants import BSOFT_HOME, V1_9_0
@@ -35,7 +35,7 @@ _logo = "bsoft_logo.png"
 _references = ['Heymann2007']
 
 
-class Plugin(pyworkflow.em.Plugin):
+class Plugin(pwem.Plugin):
     _homeVar = BSOFT_HOME
     _pathVars = [BSOFT_HOME]
     _supportedVersions = [V1_9_0]
@@ -71,4 +71,4 @@ class Plugin(pyworkflow.em.Plugin):
                        default=True)
 
 
-pyworkflow.em.Domain.registerPlugin(__name__)
+pwem.Domain.registerPlugin(__name__)

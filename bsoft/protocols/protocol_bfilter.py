@@ -26,7 +26,7 @@
 
 import pyworkflow.utils as pwutils
 import pyworkflow.protocol.params as params
-import pyworkflow.em as em
+import pwem as em
 
 import bsoft
 from bsoft.constants import (FILTER_MEDIAN, FILTER_PEAK,

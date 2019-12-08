@@ -24,5 +24,5 @@
 # *
 # **************************************************************************
 
-from bsoft_viewers import (BsoftVolumeView, BsoftViewer, BsoftViewerBlocres,
+from .bsoft_viewers import (BsoftVolumeView, BsoftViewer, BsoftViewerBlocres,
                            BsoftPlotter)

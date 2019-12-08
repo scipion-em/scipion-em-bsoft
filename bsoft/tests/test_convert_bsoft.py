@@ -27,14 +27,16 @@
 import os
 import subprocess
 
-from pyworkflow.em.data import *
+from pwem.convert import ImageHandler
+from pwem.objects import *
 from pyworkflow.tests import *
+from pyworkflow.utils import cleanPath
 from pyworkflow.utils.properties import colorText
-from pyworkflow.utils import cleanPath, importFromPlugin
+from pwem import Domain
 
 
 import xmippLib as xmipp
-xmipp3 = importFromPlugin('xmipp3', doRaise=True)
+xmipp3 = Domain.importFromPlugin('xmipp3', doRaise=True)
 
 from bsoft import *
 
@@ -58,7 +60,7 @@ from bsoft import *
 # the tests and work on them
 #
 
-class BaseTest():
+class BaseTest:
     pass
 
 class TestBasic(BaseTest):
@@ -81,8 +83,8 @@ class TestBasic(BaseTest):
     
     def test_rowToCtfModel(self):
 
-        XmippMdRow = importFromPlugin('xmipp3.base', 'XmippMdRow', doRaise=True)
-        rowToCtfModel = importFromPlugin('xmipp3.convert', 'rowToCtfModel')
+        XmippMdRow = Domain.importFromPlugin('xmipp3.base', 'XmippMdRow', doRaise=True)
+        rowToCtfModel = Domain.importFromPlugin('xmipp3.convert', 'rowToCtfModel')
 
         row = XmippMdRow()
         row.setValue(xmipp.MDL_CTF_DEFOCUSU, 2520.)
@@ -104,8 +106,8 @@ class TestBasic(BaseTest):
         self.assertIsNone(ctf)
         
     def test_rowToImage(self):
-        XmippMdRow = importFromPlugin('xmipp3.base', 'XmippMdRow')
-        rowToImage = importFromPlugin('xmipp3.convert', 'rowToImage')
+        XmippMdRow = Domain.importFromPlugin('xmipp3.base', 'XmippMdRow')
+        rowToImage = Domain.importFromPlugin('xmipp3.convert', 'rowToImage')
 
         row = XmippMdRow()
         index = 1
@@ -128,7 +130,7 @@ PRINT_FILES = False#False
 
 
 def runBsoftProgram(cmd):
-    print ">>>", cmd
+    print(">>>", cmd)
     p = subprocess.Popen(cmd, shell=True, env=xmipp3.Plugin.getEnviron())
     return p.wait()   
 
@@ -153,10 +155,10 @@ class TestConvertBase(BaseTest):
             mList: the matrix list of transformations 
                 (should be the same length of the stack of images)
         """
-        print "\n"
-        print "*" * 80
-        print "* Launching test: ", fileKey
-        print "*" * 80
+        print("\n")
+        print("*" * 80)
+        print("* Launching test: ", fileKey)
+        print("*" * 80)
 
         stackFn = self.dataset.getFile(fileKey)
         partFn1 = self.getOutputPath(fileKey + "_particles1.sqlite")
@@ -171,12 +173,12 @@ class TestConvertBase(BaseTest):
             goldFn = self.dataset.getFile(fileKey + '_Gold_output.vol')
 
         if PRINT_FILES:
-            print "BINARY DATA: ", stackFn
-            print "SET1:        ", partFn1
-            print "  MD:        ", mdFn
-            print "SET2:        ", partFn2
-            print "OUTPUT:      ", outputFn
-            print "GOLD:        ", goldFn
+            print("BINARY DATA: ", stackFn)
+            print("SET1:        ", partFn1)
+            print("  MD:        ", mdFn)
+            print("SET2:        ", partFn2)
+            print("OUTPUT:      ", outputFn)
+            print("GOLD:        ", goldFn)
 
         if is2D:
             partSet = SetOfParticles(filename=partFn1)
@@ -201,12 +203,12 @@ class TestConvertBase(BaseTest):
         # Convert to a Xmipp metadata and also check that the images are
         # aligned correctly
         if is2D:
-            writeSetOfParticles = importFromPlugin('xmipp3.convert',
+            writeSetOfParticles = Domain.importFromPlugin('xmipp3.convert',
                                                    'writeSetOfParticles')
             writeSetOfParticles(partSet, mdFn, is2D=is2D,
                                 inverseTransform=inverseTransform)
         else:
-            writeSetOfVolumes = importFromPlugin('xmipp3.convert',
+            writeSetOfVolumes = Domain.importFromPlugin('xmipp3.convert',
                                                  'writeSetOfVolumes')
             writeSetOfVolumes(partSet, mdFn, is2D=is2D,
                               inverseTransform=inverseTransform)
@@ -214,7 +216,7 @@ class TestConvertBase(BaseTest):
         # Xmipp metadata and check one more time.
         partSet2 = SetOfParticles(filename=partFn2)
         partSet2.copyInfo(partSet)
-        readSetOfParticles = importFromPlugin('xmipp3.convert',
+        readSetOfParticles = Domain.importFromPlugin('xmipp3.convert',
                                               'readSetOfParticles')
         if is2D:
             readSetOfParticles(mdFn, partSet2, is2D=is2D,
@@ -229,10 +231,10 @@ class TestConvertBase(BaseTest):
             for i, img in enumerate(partSet2):
                 m1 = aList[i]
                 m2 = img.getTransform().getMatrix()
-                print "-"*5
-                print img.getFileName(), img.getIndex()
-                print 'm1:\n', m1
-                print 'm2:\n', m2
+                print("-"*5)
+                print(img.getFileName(), img.getIndex())
+                print('m1:\n', m1)
+                print('m2:\n', m2)
                 self.assertTrue(np.allclose(m1, m2, rtol=1e-2))
 
         # Launch apply transformation and check result images
@@ -244,7 +246,7 @@ class TestConvertBase(BaseTest):
         if os.path.exists(goldFn):
             self.assertTrue(ImageHandler().compareData(goldFn, outputFn, tolerance=0.001))
         else:
-            print colorText.RED + colorText.BOLD + "WARNING: Gold file '%s' missing!!!" % goldFn + colorText.END
+            print(colorText.RED + colorText.BOLD + "WARNING: Gold file '%s' missing!!!" % goldFn + colorText.END)
 
         if CLEAN_IMAGES:
             cleanPath(outputFn)
@@ -257,17 +259,17 @@ class TestAlignment(TestConvertBase):
     def test_isInverse(self):
         def _testInv(matrixList):
             a = Transform(matrixList)
-            XmippMdRow = importFromPlugin('xmipp3.base', 'XmippMdRow',
+            XmippMdRow = Domain.importFromPlugin('xmipp3.base', 'XmippMdRow',
                                           doRaise=True)
-            alignmentToRow = importFromPlugin('xmipp3.convert','alignmentToRow')
+            alignmentToRow = Domain.importFromPlugin('xmipp3.convert','alignmentToRow')
             
             row = XmippMdRow()
             alignmentToRow(a, row, is2D=True, inverseTransform=False)
-            print "isInv=False, row", row      
+            print("isInv=False, row", row)
             
             row2 = XmippMdRow()
             alignmentToRow(a, row2, is2D=True, inverseTransform=True)
-            print "isInv=True, row2", row2
+            print("isInv=True, row2", row2)
           
         _testInv([[1.0, 0.0, 0.0, 20.0],
                   [0.0, 1.0, 0.0, 0.0],
@@ -361,9 +363,9 @@ class TestAlignment(TestConvertBase):
 
         # Convert to a Xmipp metadata and also check that the images are
         # aligned correctly
-        writeSetOfParticles = importFromPlugin('xmipp3.convert',
+        writeSetOfParticles = Domain.importFromPlugin('xmipp3.convert',
                                                'writeSetOfParticles')
-        readSetOfParticles = importFromPlugin('xmipp3.convert',
+        readSetOfParticles = Domain.importFromPlugin('xmipp3.convert',
                                               'readSetOfParticles')
 
         writeSetOfParticles(partSet, mdFn, is2D=True, inverseTransform=False)
@@ -384,10 +386,10 @@ class TestAlignment(TestConvertBase):
             for i, img in enumerate(partSet2):
                 m1 = aList[i]
                 m2 = img.getTransform().getMatrix()
-                print "-"*5
-                print img.getFileName(), img.getIndex()
-                print  >> sys.stderr, 'm1:\n', m1
-                print  >> sys.stderr, 'm2:\n', m2
+                print("-"*5)
+                print(img.getFileName(), img.getIndex())
+                sys.stderr.write('m1:\n', m1)
+                sys.stderr.write('m2:\n', m2)
                 self.assertTrue(np.allclose(m1, m2, rtol=1e-2))
 
         
@@ -702,9 +704,9 @@ class TestSetConvert(BaseTest):
         The resulting set should contains the x and y coordinates from
         the particle picking. 
         """
-        readSetOfParticles = importFromPlugin('xmipp3.convert',
+        readSetOfParticles = Domain.importFromPlugin('xmipp3.convert',
                                               'readSetOfParticles')
-        setOfParticlesToMd = importFromPlugin('xmipp3.convert',
+        setOfParticlesToMd = Domain.importFromPlugin('xmipp3.convert',
                                               'setOfParticlesToMd')
 
         fn = self.dataset.getFile('images10')
@@ -753,7 +755,7 @@ class TestSetConvert(BaseTest):
             p.setCTF(ctf)
             micSet.append(p)
             id = mdXmipp.addObject()
-            mdXmipp.setValue(xmipp.MDL_ITEM_ID, long(i+1), id)
+            mdXmipp.setValue(xmipp.MDL_ITEM_ID, int(i+1), id)
             mdXmipp.setValue(xmipp.MDL_MICROGRAPH, file, id)
             # set CTFModel params
             mdXmipp.setValue(xmipp.MDL_CTF_DEFOCUSU, ctf.getDefocusU(), id)
@@ -764,9 +766,9 @@ class TestSetConvert(BaseTest):
             mdXmipp.setValue(xmipp.MDL_CTF_CS, acquisition.getSphericalAberration(), id)
             mdXmipp.setValue(xmipp.MDL_CTF_VOLTAGE, acquisition.getVoltage(), id)
 
-        setOfMicrographsToMd = importFromPlugin('xmipp3.convert',
+        setOfMicrographsToMd = Domain.importFromPlugin('xmipp3.convert',
                                                 'setOfMicrographsToMd')
-        writeSetOfMicrographs = importFromPlugin('xmipp3.convert',
+        writeSetOfMicrographs = Domain.importFromPlugin('xmipp3.convert',
                                                  'writeSetOfMicrographs')
         mdScipion = xmipp.MetaData()
         setOfMicrographsToMd(micSet, mdScipion)
@@ -776,9 +778,9 @@ class TestSetConvert(BaseTest):
     def test_alignedParticlesToMd(self):
         """ Test the conversion of a SetOfParticles to Xmipp metadata. """
         fn = self.dataset.getFile('aligned_particles')
-        setOfParticlesToMd = importFromPlugin('xmipp3.convert',
+        setOfParticlesToMd = Domain.importFromPlugin('xmipp3.convert',
                                               'writeSetOfMicrographs')
-        print "Converting sqlite: %s" % fn
+        print("Converting sqlite: %s" % fn)
         imgSet = SetOfParticles(filename=fn) 
         imgSet.setAcquisition(Acquisition(magnification=60000,
                                           voltage=300,
@@ -800,9 +802,9 @@ class TestSetConvert(BaseTest):
     def test_particlesToMd(self):
         """ Test the conversion of a SetOfParticles to Xmipp metadata. """
         imgSet = SetOfParticles(filename=self.getOutputPath("particles.sqlite"))
-        setOfParticlesToMd = importFromPlugin('xmipp3.convert',
+        setOfParticlesToMd = Domain.importFromPlugin('xmipp3.convert',
                                               'writeSetOfMicrographs')
-        locationToXmipp = importFromPlugin('xmipp3.convert', 'locationToXmipp')
+        locationToXmipp = Domain.importFromPlugin('xmipp3.convert', 'locationToXmipp')
         n = 10
         fn = self.particles
         ctfs = [CTFModel(defocusU=10000, defocusV=15000, defocusAngle=15),
@@ -821,7 +823,7 @@ class TestSetConvert(BaseTest):
             p.setAcquisition(acquisition)
             imgSet.append(p)
             id = mdXmipp.addObject()
-            mdXmipp.setValue(xmipp.MDL_ITEM_ID, long(i+1), id)
+            mdXmipp.setValue(xmipp.MDL_ITEM_ID, int(i+1), id)
             mdXmipp.setValue(xmipp.MDL_IMAGE, locationToXmipp(i+1, fn), id)
             # set CTFModel params
             mdXmipp.setValue(xmipp.MDL_CTF_DEFOCUSU, ctf.getDefocusU(), id)
@@ -839,9 +841,9 @@ class TestSetConvert(BaseTest):
                 
     def test_CTF(self):
         """ Test the conversion of a SetOfParticles to Xmipp metadata. """
-        rowFromMd = importFromPlugin('xmipp3.convert', 'rowFromMd',
+        rowFromMd = Domain.importFromPlugin('xmipp3.convert', 'rowFromMd',
                                      doRaise=True)
-        rowToCtfModel = importFromPlugin('xmipp3.convert', 'rowToCtfModel',
+        rowToCtfModel = Domain.importFromPlugin('xmipp3.convert', 'rowToCtfModel',
                                      doRaise=True)
 
         mdCtf = xmipp.MetaData(self.dataset.getFile('ctfGold'))
@@ -893,11 +895,11 @@ class TestSetConvert(BaseTest):
         
     def test_writeSetOfDefocusGroups(self):
         #reference metadata
-        XmippMdRow = importFromPlugin('xmipp3.base', 'XmippMdRow', doRaise=True)
-        writeSetOfDefocusGroups = importFromPlugin('xmipp3.convert',
+        XmippMdRow = Domain.importFromPlugin('xmipp3.base', 'XmippMdRow', doRaise=True)
+        writeSetOfDefocusGroups = Domain.importFromPlugin('xmipp3.convert',
                                                    'writeSetOfDefocusGroups',
                                                    doRaise=True)
-        xmippLabel = importFromPlugin('xmipp3.convert', 'XmippMdRow', doRaise=True)
+        xmippLabel = Domain.importFromPlugin('xmipp3.convert', 'XmippMdRow', doRaise=True)
 
         md = xmipp.MetaData()
         objId = md.addObject()
