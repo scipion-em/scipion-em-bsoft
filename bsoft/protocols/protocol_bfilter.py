@@ -27,6 +27,7 @@
 import pyworkflow.utils as pwutils
 import pyworkflow.protocol.params as params
 import pwem as em
+from pwem.protocols import ProtFilterParticles
 
 import bsoft
 from bsoft.constants import (FILTER_MEDIAN, FILTER_PEAK,
@@ -66,12 +67,12 @@ Parameters:
 
 
 
-class BsoftProtBfilter(em.ProtFilterParticles):
+class BsoftProtBfilter(ProtFilterParticles):
     """ Wrapper around bfilter program of BSOFT. """
     _label = 'bfilter'
     
     def __init__(self, **kwargs):
-        em.ProtFilterParticles.__init__(self, **kwargs)
+        ProtFilterParticles.__init__(self, **kwargs)
 
     #--------------------------- DEFINE param functions ------------------------
     def _defineProcessParams(self, form):
