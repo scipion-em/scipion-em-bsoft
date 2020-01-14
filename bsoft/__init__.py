@@ -71,4 +71,3 @@ class Plugin(pwem.Plugin):
                        default=True)
 
 
-pwem.Domain.registerPlugin(__name__)

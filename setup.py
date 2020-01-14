@@ -32,5 +32,8 @@ setup(
     packages=find_packages(),
     package_data={  # Optional
        'bsoft': ['bsoft_logo.png', 'protocols.conf'],
-    }
+    },
+    entry_points={
+        'pyworkflow.plugin': 'bsoft = bsoft'
+    },
 )
