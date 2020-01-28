@@ -26,7 +26,7 @@
 
 from matplotlib import cm
 
-from pwem.convert import ImageHandler
+from pwem.emlib.image import ImageHandler
 from pwem.constants import (COLOR_CHOICES, COLOR_OTHER,
                                      COLOR_JET, COLOR_TERRAIN, COLOR_GIST_EARTH,
                                      COLOR_GIST_NCAR, COLOR_GNU_PLOT,

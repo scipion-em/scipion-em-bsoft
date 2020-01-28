@@ -30,7 +30,7 @@ import os
 
 from pyworkflow.utils.path import cleanPath
 import pyworkflow.gui.dialog as dialog
-from pwem.convert import ImageHandler
+from pwem.emlib.image import ImageHandler
 from pwem.wizards import (DownsampleDialog, ImagePreviewDialog,
                                   FilterParticlesWizard)
     

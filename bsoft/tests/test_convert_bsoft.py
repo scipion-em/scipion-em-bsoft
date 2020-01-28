@@ -27,15 +27,15 @@
 import os
 import subprocess
 
-from pwem.convert import ImageHandler
+from pwem.emlib.image import ImageHandler
 from pwem.objects import *
 from pyworkflow.tests import *
 from pyworkflow.utils import cleanPath
 from pyworkflow.utils.properties import colorText
 from pwem import Domain
+from pwem import emlib
 
 
-import xmippLib as xmipp
 xmipp3 = Domain.importFromPlugin('xmipp3', doRaise=True)
 
 from bsoft import *
@@ -87,21 +87,21 @@ class TestBasic(BaseTest):
         rowToCtfModel = Domain.importFromPlugin('xmipp3.convert', 'rowToCtfModel')
 
         row = XmippMdRow()
-        row.setValue(xmipp.MDL_CTF_DEFOCUSU, 2520.)
-        row.setValue(xmipp.MDL_CTF_DEFOCUSV, 2510.)
-        row.setValue(xmipp.MDL_CTF_DEFOCUS_ANGLE, 45.)
+        row.setValue(emlib.MDL_CTF_DEFOCUSU, 2520.)
+        row.setValue(emlib.MDL_CTF_DEFOCUSV, 2510.)
+        row.setValue(emlib.MDL_CTF_DEFOCUS_ANGLE, 45.)
         
         ctf = rowToCtfModel(row)
         ctf.printAll()        
         # Check that the ctf object was properly set
         self.assertTrue(ctf.equalAttributes(self.getCTF(2520., 2510., 45.)))
         # Check when the EMX standarization takes place
-        row.setValue(xmipp.MDL_CTF_DEFOCUSV, 2530.)
+        row.setValue(emlib.MDL_CTF_DEFOCUSV, 2530.)
         ctf = rowToCtfModel(row)
         self.assertTrue(ctf.equalAttributes(self.getCTF(2530., 2520., 135.)))
         
         # When one of CTF labels is missing, None should be returned
-        row.removeLabel(xmipp.MDL_CTF_DEFOCUSV)
+        row.removeLabel(emlib.MDL_CTF_DEFOCUSV)
         ctf = rowToCtfModel(row)       
         self.assertIsNone(ctf)
         
@@ -112,10 +112,10 @@ class TestBasic(BaseTest):
         row = XmippMdRow()
         index = 1
         filename = 'images.stk'
-        row.setValue(xmipp.MDL_ITEM_ID, 1)
-        row.setValue(xmipp.MDL_IMAGE, '%d@%s' % (index, filename))
+        row.setValue(emlib.MDL_ITEM_ID, 1)
+        row.setValue(emlib.MDL_IMAGE, '%d@%s' % (index, filename))
         
-        img = rowToImage(row, xmipp.MDL_IMAGE, Particle)
+        img = rowToImage(row, emlib.MDL_IMAGE, Particle)
         
         # Check correct index and filename
         self.assertEquals(index, img.getIndex())
@@ -720,10 +720,10 @@ class TestSetConvert(BaseTest):
             self.assertTrue(img.getCoordinate() is not None)    
             self.assertTrue(img.hasCTF())
             
-        mdIn = xmipp.MetaData(fn)
+        mdIn = emlib.MetaData(fn)
         #print mdIn
         
-        mdOut = xmipp.MetaData()
+        mdOut = emlib.MetaData()
         setOfParticlesToMd(partSet, mdOut)
         #print mdOut
         
@@ -744,7 +744,7 @@ class TestSetConvert(BaseTest):
                                   amplitudeContrast=0.07)
         micSet.setAcquisition(acquisition)
         micSet.setSamplingRate(1.)
-        mdXmipp = xmipp.MetaData()
+        mdXmipp = emlib.MetaData()
         
 
         for i in range(n):
@@ -755,22 +755,22 @@ class TestSetConvert(BaseTest):
             p.setCTF(ctf)
             micSet.append(p)
             id = mdXmipp.addObject()
-            mdXmipp.setValue(xmipp.MDL_ITEM_ID, int(i+1), id)
-            mdXmipp.setValue(xmipp.MDL_MICROGRAPH, file, id)
+            mdXmipp.setValue(emlib.MDL_ITEM_ID, int(i+1), id)
+            mdXmipp.setValue(emlib.MDL_MICROGRAPH, file, id)
             # set CTFModel params
-            mdXmipp.setValue(xmipp.MDL_CTF_DEFOCUSU, ctf.getDefocusU(), id)
-            mdXmipp.setValue(xmipp.MDL_CTF_DEFOCUSV, ctf.getDefocusV(), id)
-            mdXmipp.setValue(xmipp.MDL_CTF_DEFOCUS_ANGLE, ctf.getDefocusAngle(), id)
+            mdXmipp.setValue(emlib.MDL_CTF_DEFOCUSU, ctf.getDefocusU(), id)
+            mdXmipp.setValue(emlib.MDL_CTF_DEFOCUSV, ctf.getDefocusV(), id)
+            mdXmipp.setValue(emlib.MDL_CTF_DEFOCUS_ANGLE, ctf.getDefocusAngle(), id)
             # set Acquisition params
-            mdXmipp.setValue(xmipp.MDL_CTF_Q0, acquisition.getAmplitudeContrast(), id)
-            mdXmipp.setValue(xmipp.MDL_CTF_CS, acquisition.getSphericalAberration(), id)
-            mdXmipp.setValue(xmipp.MDL_CTF_VOLTAGE, acquisition.getVoltage(), id)
+            mdXmipp.setValue(emlib.MDL_CTF_Q0, acquisition.getAmplitudeContrast(), id)
+            mdXmipp.setValue(emlib.MDL_CTF_CS, acquisition.getSphericalAberration(), id)
+            mdXmipp.setValue(emlib.MDL_CTF_VOLTAGE, acquisition.getVoltage(), id)
 
         setOfMicrographsToMd = Domain.importFromPlugin('xmipp3.convert',
                                                 'setOfMicrographsToMd')
         writeSetOfMicrographs = Domain.importFromPlugin('xmipp3.convert',
                                                  'writeSetOfMicrographs')
-        mdScipion = xmipp.MetaData()
+        mdScipion = emlib.MetaData()
         setOfMicrographsToMd(micSet, mdScipion)
         writeSetOfMicrographs(micSet, self.getOutputPath("micrographs.xmd"))
         self.assertEqual(mdScipion, mdXmipp, "metadata are not the same")
@@ -787,11 +787,11 @@ class TestSetConvert(BaseTest):
                                           sphericalAberration=0.1,
                                           amplitudeContrast=0.1))
         
-        md = xmipp.MetaData()
+        md = emlib.MetaData()
         setOfParticlesToMd(imgSet, md)
         
         # test that the metadata contains some geometry labels
-        self.assertTrue(md.containsLabel(xmipp.MDL_SHIFT_X))
+        self.assertTrue(md.containsLabel(emlib.MDL_SHIFT_X))
         fn = self.getOutputPath("aligned_particles.xmd")
         #print "Aligned particles written to: ", fn
         #md.write(fn)
@@ -812,7 +812,7 @@ class TestSetConvert(BaseTest):
                ]
         acquisition = Acquisition(magnification=60000, voltage=300,
                                   sphericalAberration=2., amplitudeContrast=0.07)
-        mdXmipp = xmipp.MetaData()
+        mdXmipp = emlib.MetaData()
         imgSet.setAcquisition(acquisition)
 
         for i in range(n):
@@ -823,18 +823,18 @@ class TestSetConvert(BaseTest):
             p.setAcquisition(acquisition)
             imgSet.append(p)
             id = mdXmipp.addObject()
-            mdXmipp.setValue(xmipp.MDL_ITEM_ID, int(i+1), id)
-            mdXmipp.setValue(xmipp.MDL_IMAGE, locationToXmipp(i+1, fn), id)
+            mdXmipp.setValue(emlib.MDL_ITEM_ID, int(i+1), id)
+            mdXmipp.setValue(emlib.MDL_IMAGE, locationToXmipp(i+1, fn), id)
             # set CTFModel params
-            mdXmipp.setValue(xmipp.MDL_CTF_DEFOCUSU, ctf.getDefocusU(), id)
-            mdXmipp.setValue(xmipp.MDL_CTF_DEFOCUSV, ctf.getDefocusV(), id)
-            mdXmipp.setValue(xmipp.MDL_CTF_DEFOCUS_ANGLE, ctf.getDefocusAngle(), id)
+            mdXmipp.setValue(emlib.MDL_CTF_DEFOCUSU, ctf.getDefocusU(), id)
+            mdXmipp.setValue(emlib.MDL_CTF_DEFOCUSV, ctf.getDefocusV(), id)
+            mdXmipp.setValue(emlib.MDL_CTF_DEFOCUS_ANGLE, ctf.getDefocusAngle(), id)
             # set Acquisition params
-            mdXmipp.setValue(xmipp.MDL_CTF_Q0, acquisition.getAmplitudeContrast(), id)
-            mdXmipp.setValue(xmipp.MDL_CTF_CS, acquisition.getSphericalAberration(), id)
-            mdXmipp.setValue(xmipp.MDL_CTF_VOLTAGE, acquisition.getVoltage(), id)
+            mdXmipp.setValue(emlib.MDL_CTF_Q0, acquisition.getAmplitudeContrast(), id)
+            mdXmipp.setValue(emlib.MDL_CTF_CS, acquisition.getSphericalAberration(), id)
+            mdXmipp.setValue(emlib.MDL_CTF_VOLTAGE, acquisition.getVoltage(), id)
             
-        mdScipion = xmipp.MetaData()
+        mdScipion = emlib.MetaData()
         setOfParticlesToMd(imgSet, mdScipion)
         self.assertEqual(mdScipion, mdXmipp, "metadata are not the same")
         
@@ -846,51 +846,51 @@ class TestSetConvert(BaseTest):
         rowToCtfModel = Domain.importFromPlugin('xmipp3.convert', 'rowToCtfModel',
                                      doRaise=True)
 
-        mdCtf = xmipp.MetaData(self.dataset.getFile('ctfGold'))
+        mdCtf = emlib.MetaData(self.dataset.getFile('ctfGold'))
         objId = mdCtf.firstObject()
         rowCtf = rowFromMd(mdCtf, objId)
         ctf = rowToCtfModel(rowCtf)        
         
         ALL_CTF_LABELS = [   
-            xmipp.MDL_CTF_CA,
-            xmipp.MDL_CTF_ENERGY_LOSS,
-            xmipp.MDL_CTF_LENS_STABILITY,
-            xmipp.MDL_CTF_CONVERGENCE_CONE,
-            xmipp.MDL_CTF_LONGITUDINAL_DISPLACEMENT,
-            xmipp.MDL_CTF_TRANSVERSAL_DISPLACEMENT,
-            xmipp.MDL_CTF_K,
-            xmipp.MDL_CTF_BG_GAUSSIAN_K,
-            xmipp.MDL_CTF_BG_GAUSSIAN_SIGMAU,
-            xmipp.MDL_CTF_BG_GAUSSIAN_SIGMAV,
-            xmipp.MDL_CTF_BG_GAUSSIAN_CU,
-            xmipp.MDL_CTF_BG_GAUSSIAN_CV,
-            xmipp.MDL_CTF_BG_SQRT_K,
-            xmipp.MDL_CTF_BG_SQRT_U,
-            xmipp.MDL_CTF_BG_SQRT_V,
-            xmipp.MDL_CTF_BG_SQRT_ANGLE,
-            xmipp.MDL_CTF_BG_BASELINE,
-            xmipp.MDL_CTF_BG_GAUSSIAN2_K,
-            xmipp.MDL_CTF_BG_GAUSSIAN2_SIGMAU,
-            xmipp.MDL_CTF_BG_GAUSSIAN2_SIGMAV,
-            xmipp.MDL_CTF_BG_GAUSSIAN2_CU,
-            xmipp.MDL_CTF_BG_GAUSSIAN2_CV,
-            xmipp.MDL_CTF_BG_GAUSSIAN2_ANGLE,
-            xmipp.MDL_CTF_CRIT_FITTINGSCORE,
-            xmipp.MDL_CTF_CRIT_FITTINGCORR13,
-            xmipp.MDL_CTF_DOWNSAMPLE_PERFORMED,
-            xmipp.MDL_CTF_CRIT_PSDVARIANCE,
-            xmipp.MDL_CTF_CRIT_PSDPCA1VARIANCE,
-            xmipp.MDL_CTF_CRIT_PSDPCARUNSTEST,
-            xmipp.MDL_CTF_CRIT_FIRSTZEROAVG,
-            xmipp.MDL_CTF_CRIT_DAMPING,
-            xmipp.MDL_CTF_CRIT_FIRSTZERORATIO,
-            xmipp.MDL_CTF_CRIT_PSDCORRELATION90,
-            xmipp.MDL_CTF_CRIT_PSDRADIALINTEGRAL,
-            xmipp.MDL_CTF_CRIT_NORMALITY,  
+            emlib.MDL_CTF_CA,
+            emlib.MDL_CTF_ENERGY_LOSS,
+            emlib.MDL_CTF_LENS_STABILITY,
+            emlib.MDL_CTF_CONVERGENCE_CONE,
+            emlib.MDL_CTF_LONGITUDINAL_DISPLACEMENT,
+            emlib.MDL_CTF_TRANSVERSAL_DISPLACEMENT,
+            emlib.MDL_CTF_K,
+            emlib.MDL_CTF_BG_GAUSSIAN_K,
+            emlib.MDL_CTF_BG_GAUSSIAN_SIGMAU,
+            emlib.MDL_CTF_BG_GAUSSIAN_SIGMAV,
+            emlib.MDL_CTF_BG_GAUSSIAN_CU,
+            emlib.MDL_CTF_BG_GAUSSIAN_CV,
+            emlib.MDL_CTF_BG_SQRT_K,
+            emlib.MDL_CTF_BG_SQRT_U,
+            emlib.MDL_CTF_BG_SQRT_V,
+            emlib.MDL_CTF_BG_SQRT_ANGLE,
+            emlib.MDL_CTF_BG_BASELINE,
+            emlib.MDL_CTF_BG_GAUSSIAN2_K,
+            emlib.MDL_CTF_BG_GAUSSIAN2_SIGMAU,
+            emlib.MDL_CTF_BG_GAUSSIAN2_SIGMAV,
+            emlib.MDL_CTF_BG_GAUSSIAN2_CU,
+            emlib.MDL_CTF_BG_GAUSSIAN2_CV,
+            emlib.MDL_CTF_BG_GAUSSIAN2_ANGLE,
+            emlib.MDL_CTF_CRIT_FITTINGSCORE,
+            emlib.MDL_CTF_CRIT_FITTINGCORR13,
+            emlib.MDL_CTF_DOWNSAMPLE_PERFORMED,
+            emlib.MDL_CTF_CRIT_PSDVARIANCE,
+            emlib.MDL_CTF_CRIT_PSDPCA1VARIANCE,
+            emlib.MDL_CTF_CRIT_PSDPCARUNSTEST,
+            emlib.MDL_CTF_CRIT_FIRSTZEROAVG,
+            emlib.MDL_CTF_CRIT_DAMPING,
+            emlib.MDL_CTF_CRIT_FIRSTZERORATIO,
+            emlib.MDL_CTF_CRIT_PSDCORRELATION90,
+            emlib.MDL_CTF_CRIT_PSDRADIALINTEGRAL,
+            emlib.MDL_CTF_CRIT_NORMALITY,  
         ]      
 
         for label in ALL_CTF_LABELS:
-            attrName = '_xmipp_%s' % xmipp.label2Str(label)
+            attrName = '_xmipp_%s' % emlib.label2Str(label)
             self.assertAlmostEquals(mdCtf.getValue(label, objId), ctf.getAttributeValue(attrName))
         
     def test_writeSetOfDefocusGroups(self):
@@ -901,21 +901,21 @@ class TestSetConvert(BaseTest):
                                                    doRaise=True)
         xmippLabel = Domain.importFromPlugin('xmipp3.convert', 'XmippMdRow', doRaise=True)
 
-        md = xmipp.MetaData()
+        md = emlib.MetaData()
         objId = md.addObject()
         defocusGroupRow = XmippMdRow()
 
-        defocusGroupRow.setValue(xmipp.MDL_CTF_GROUP, 1)
-        defocusGroupRow.setValue(xmipp.MDL_MIN, 2000.)
-        defocusGroupRow.setValue(xmipp.MDL_MAX, 2500.)
-        defocusGroupRow.setValue(xmipp.MDL_AVG, 2100.)
+        defocusGroupRow.setValue(emlib.MDL_CTF_GROUP, 1)
+        defocusGroupRow.setValue(emlib.MDL_MIN, 2000.)
+        defocusGroupRow.setValue(emlib.MDL_MAX, 2500.)
+        defocusGroupRow.setValue(emlib.MDL_AVG, 2100.)
         defocusGroupRow.writeToMd(md, objId)
 
         objId = md.addObject()
-        defocusGroupRow.setValue(xmipp.MDL_CTF_GROUP, 2)
-        defocusGroupRow.setValue(xmipp.MDL_MIN, 3000.)
-        defocusGroupRow.setValue(xmipp.MDL_MAX, 5500.)
-        defocusGroupRow.setValue(xmipp.MDL_AVG, 5000.)
+        defocusGroupRow.setValue(emlib.MDL_CTF_GROUP, 2)
+        defocusGroupRow.setValue(emlib.MDL_MIN, 3000.)
+        defocusGroupRow.setValue(emlib.MDL_MAX, 5500.)
+        defocusGroupRow.setValue(emlib.MDL_AVG, 5000.)
         defocusGroupRow.writeToMd(md, objId)
         #
         fnScipion=self.getOutputPath("writeSetOfDefocusGroups.sqlite")
@@ -936,5 +936,5 @@ class TestSetConvert(BaseTest):
         fnXmipp=self.getOutputPath("writeSetOfDefocusGroups.xmd")
 
         writeSetOfDefocusGroups(setOfDefocus, fnXmipp)
-        mdAux = xmipp.MetaData(fnXmipp)
+        mdAux = emlib.MetaData(fnXmipp)
         self.assertEqual(md,mdAux, "test writeSetOfDefocusGroups fails")

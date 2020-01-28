@@ -28,7 +28,7 @@ import numpy as np
 
 import pyworkflow.protocol.params as params
 from pwem.protocols.protocol_3d import ProtAnalysis3D
-from pwem.convert import ImageHandler
+from pwem.emlib.image import ImageHandler
 from pyworkflow.object import Float
 from pwem.objects import Volume
 
