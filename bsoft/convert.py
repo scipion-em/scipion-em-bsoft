@@ -24,7 +24,7 @@
 # *
 # **************************************************************************
 
-import pwem.metadata as md
+import pwem.emlib.metadata as md
 from pwem.objects import Coordinate
 from pyworkflow.object import String, ObjectWrap
 from pyworkflow.utils import join, replaceBaseExt, createLink, exists
