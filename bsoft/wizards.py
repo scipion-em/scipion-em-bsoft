@@ -30,8 +30,8 @@ import os
 
 from pyworkflow.utils.path import cleanPath
 import pyworkflow.gui.dialog as dialog
-from pyworkflow.em.convert import ImageHandler
-from pyworkflow.em.wizard import (DownsampleDialog, ImagePreviewDialog,
+from pwem.emlib.image import ImageHandler
+from pwem.wizards import (DownsampleDialog, ImagePreviewDialog,
                                   FilterParticlesWizard)
     
 from bsoft.protocols import BsoftProtBfilter

@@ -25,7 +25,7 @@
 # **************************************************************************
 
 from pyworkflow.tests import BaseTest, DataSet, setupTestProject
-from pyworkflow.em.protocol import ProtImportVolumes, ProtImportMask
+from pwem.protocols import ProtImportVolumes, ProtImportMask
 
 from bsoft.protocols import BsoftProtBlocres
 

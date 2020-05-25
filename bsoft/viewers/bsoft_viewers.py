@@ -26,13 +26,13 @@
 
 from matplotlib import cm
 
-from pyworkflow.em.convert import ImageHandler
-from pyworkflow.em.constants import (COLOR_CHOICES, COLOR_OTHER,
+from pwem.emlib.image import ImageHandler
+from pwem.constants import (COLOR_CHOICES, COLOR_OTHER,
                                      COLOR_JET, COLOR_TERRAIN, COLOR_GIST_EARTH,
                                      COLOR_GIST_NCAR, COLOR_GNU_PLOT,
                                       COLOR_GNU_PLOT2, AX_X, AX_Y, AX_Z)
-from pyworkflow.em.data import Volume
-from pyworkflow.em.viewers import (ChimeraView, EmPlotter, DataView,
+from pwem.objects import Volume
+from pwem.viewers import (ChimeraView, EmPlotter, DataView,
                                   LocalResolutionViewer)
 from pyworkflow.viewer import CommandView, Viewer
 from pyworkflow.protocol.params import (LabelParam, StringParam,
@@ -165,7 +165,7 @@ class BsoftViewerBlocres(LocalResolutionViewer):
                                                      %self._getAxis())
         #The slices to be shown are close to the center. Volume size is divided in 
         # 9 segments, the fouth central ones are selected i.e. 3,4,5,6
-        for i in xrange(3,7): 
+        for i in list(range(3,7)):
             sliceNumber = self.getSlice(i, imgData)
             a = xplotter.createSubPlot("Slice %s" % (sliceNumber+1), '', '')
             matrix = self.getSliceImage(imgData, sliceNumber, self._getAxis())

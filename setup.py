@@ -22,7 +22,7 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
 
 setup(
     name='scipion-em-bsoft',  # Required
-    version='1.0.3',  # Required
+    version='3.0.0',  # Required
     description='Bsoft ready to use in scipion.',  # Required
     long_description=long_description,  # Optional
     url='https://github.com/scipion-em/scipion-em-bsoft',  # Optional
@@ -32,5 +32,8 @@ setup(
     packages=find_packages(),
     package_data={  # Optional
        'bsoft': ['bsoft_logo.png', 'protocols.conf'],
-    }
+    },
+    entry_points={
+        'pyworkflow.plugin': 'bsoft = bsoft'
+    },
 )

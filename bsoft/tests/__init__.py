@@ -24,8 +24,8 @@
 # *
 # **************************************************************************
 
-from test_convert_bsoft import (BaseTest, TestAlignment, TestBasic,
+from .test_convert_bsoft import (BaseTest, TestAlignment, TestBasic,
                                 TestConvertBase, TestReconstruct,
                                 TestSetConvert)
-from test_protocols_bsoft_blocres import (TestBsoftBlocres,
+from .test_protocols_bsoft_blocres import (TestBsoftBlocres,
                                           TestBsoftBlocresBase)

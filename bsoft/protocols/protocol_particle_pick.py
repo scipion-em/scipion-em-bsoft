@@ -28,7 +28,7 @@
 
 from os.path import abspath, basename
 
-from pyworkflow.em.protocol import ProtParticlePicking
+from pwem.protocols import ProtParticlePicking
 from pyworkflow.protocol.params import FloatParam
 from pyworkflow.utils.properties import Message
 from pyworkflow.gui.dialog import askYesNo

@@ -27,10 +27,10 @@
 import numpy as np
 
 import pyworkflow.protocol.params as params
-from pyworkflow.em.protocol.protocol_3d import ProtAnalysis3D
-from pyworkflow.em import ImageHandler
+from pwem.protocols.protocol_3d import ProtAnalysis3D
+from pwem.emlib.image import ImageHandler
 from pyworkflow.object import Float
-from pyworkflow.em.data import Volume
+from pwem.objects import Volume
 
 import bsoft
 from bsoft.constants import (FN_HALF1, FN_HALF2,

@@ -24,10 +24,10 @@
 # *
 # **************************************************************************
 
-import pyworkflow.em.metadata as md
-from pyworkflow.em.data import Coordinate
+import pwem.emlib.metadata as md
+from pwem.objects import Coordinate
 from pyworkflow.object import String, ObjectWrap
-from pyworkflow.utils.path import join, dirname, replaceBaseExt, createLink, exists
+from pyworkflow.utils import join, replaceBaseExt, createLink, exists
 
 from bsoft.constants import *
 
@@ -128,7 +128,7 @@ def writeSetOfParticles(imgSet, starFile, stackFile):
     mdata = md.MetaData()
     mdata.setColumnFormat(False)
     imgRow = mdata.Row()
-    imgRow.setValue("micrograph.id", long(1))
+    imgRow.setValue("micrograph.id", int(1))
     imgRow.setValue("particle.x_origin", str(stackFile))
     imgRow.writeToMd(mdata, mdata.addObject())
     imgSet._bsoftStar = String(starFile)

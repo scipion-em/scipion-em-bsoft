@@ -26,8 +26,6 @@
 
 from collections import OrderedDict
 
-import pyworkflow.em.metadata as md
-
 BSOFT_HOME = 'BSOFT_HOME'
 
 # Supported Versions
