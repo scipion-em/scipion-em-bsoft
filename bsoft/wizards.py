@@ -8,7 +8,7 @@
 # *
 # * This program is free software; you can redistribute it and/or modify
 # * it under the terms of the GNU General Public License as published by
-# * the Free Software Foundation; either version 2 of the License, or
+# * the Free Software Foundation; either version 3 of the License, or
 # * (at your option) any later version.
 # *
 # * This program is distributed in the hope that it will be useful,
@@ -30,31 +30,30 @@ import os
 
 from pyworkflow.utils.path import cleanPath
 import pyworkflow.gui.dialog as dialog
-from pyworkflow.em.convert import ImageHandler
-from pyworkflow.em.wizard import (DownsampleDialog, ImagePreviewDialog,
-                                  FilterParticlesWizard)
-    
-from bsoft.protocols import BsoftProtBfilter
+from pwem.emlib.image import ImageHandler
+from pwem.wizards import (DownsampleDialog, ImagePreviewDialog,
+                          FilterParticlesWizard)
 
+from bsoft.protocols import BsoftProtBfilter
 
 
 class BsoftFilterParticlesWizard(FilterParticlesWizard):
     _targets = [(BsoftProtBfilter, ['filterType'])]
-    
+
     def _getParameters(self, protocol):
         label, value = self._getInputProtocol(self._targets, protocol)
-        
+
         protParams = {}
         protParams['input'] = protocol.inputParticles
         protParams['label'] = label
         protParams['value'] = value
 
         return protParams
-    
+
     def _getProvider(self, protocol):
         _objs = self._getParameters(protocol)['input']
         return FilterParticlesWizard._getListProvider(self, _objs)
-    
+
     def show(self, form):
         protocol = form.protocol
         provider = self._getProvider(protocol)
@@ -62,13 +61,13 @@ class BsoftFilterParticlesWizard(FilterParticlesWizard):
         if provider is not None:
             d = BsoftFilterDialog(form.root, provider, protocolParent=protocol)
         else:
-            dialog.showWarning("Input particles", "Select particles first", form.root)  
-    
-    
-#--------------- Dialogs used by Wizards --------------------------------------
-       
+            dialog.showWarning("Input particles", "Select particles first", form.root)
+
+# --------------- Dialogs used by Wizards --------------------------------------
+
+
 class BsoftFilterDialog(DownsampleDialog):
-    
+
     def _beforePreview(self):
         ImagePreviewDialog._beforePreview(self)
         self.lastObj = None
@@ -76,31 +75,32 @@ class BsoftFilterDialog(DownsampleDialog):
         self.message = "Filtering particle..."
         self.previewLabel = "Particle"
         self.rightImage = ImageHandler()._img
-        
+
     def _createControls(self, frame):
         pass  # FIXME
-#         self.freqFrame = ttk.LabelFrame(frame, text="Frequencies", padding="5 5 5 5")
-#         self.freqFrame.grid(row=0, column=0)
-#         if self.protocolParent.filterType <= FILTER_SPACE_REAL:
-#             self.radiusSlider = self.addFreqSlider('Radius', self.protocolParent.filterRadius.get(), col=0)
-#         else:
-#             self.lfSlider = self.addFreqSlider('Low freq', self.protocolParent.lowFreq.get(), col=0)
-#             self.hfSlider = self.addFreqSlider('High freq', self.protocolParent.highFreq.get(), col=1)        
-#             if self.protocolParent.filterType == FILTER_FERMI:
-#                 self.tempSlider = self.addFreqSlider('Temperature', self.protocolParent.temperature.get(), col=2)
-#         radiusButton = tk.Button(self.freqFrame, text='Preview', command=self._doPreview)
-#         radiusButton.grid(row=0, column=3, padx=5, pady=5)
-        
+
+    #         self.freqFrame = ttk.LabelFrame(frame, text="Frequencies", padding="5 5 5 5")
+    #         self.freqFrame.grid(row=0, column=0)
+    #         if self.protocolParent.filterType <= FILTER_SPACE_REAL:
+    #             self.radiusSlider = self.addFreqSlider('Radius', self.protocolParent.filterRadius.get(), col=0)
+    #         else:
+    #             self.lfSlider = self.addFreqSlider('Low freq', self.protocolParent.lowFreq.get(), col=0)
+    #             self.hfSlider = self.addFreqSlider('High freq', self.protocolParent.highFreq.get(), col=1)
+    #             if self.protocolParent.filterType == FILTER_FERMI:
+    #                 self.tempSlider = self.addFreqSlider('Temperature', self.protocolParent.temperature.get(), col=2)
+    #         radiusButton = tk.Button(self.freqFrame, text='Preview', command=self._doPreview)
+    #         radiusButton.grid(row=0, column=3, padx=5, pady=5)
+
     def _doPreview(self, e=None):
         if self.lastObj is None:
             dialog.showError("Empty selection",
                              "Select an item first before preview", self)
         else:
             self._computeRightPreview()
-    
+
     def updateFilteredImage(self):
         self.rightPreview.updateData(self.rightImage.getData())
-        
+
     def _computeRightPreview(self):
         """ This function should compute the right preview
         using the self.lastObj that was selected
@@ -111,10 +111,10 @@ class BsoftFilterDialog(DownsampleDialog):
         cleanPath(inputPath, outputPath)
 
         ih = ImageHandler()
-        ih.convert(self.lastObj.getLocation(), inputPath) 
-                
+        ih.convert(self.lastObj.getLocation(), inputPath)
+
         self.protocolParent.runFilter(inputPath, outputPath)
-        
+
         # Get output image and update filtered image
         img = ih._img
         img.read(outputPath)

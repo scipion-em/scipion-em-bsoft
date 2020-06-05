@@ -6,7 +6,7 @@
 # *
 # * This program is free software; you can redistribute it and/or modify
 # * it under the terms of the GNU General Public License as published by
-# * the Free Software Foundation; either version 2 of the License, or
+# * the Free Software Foundation; either version 3 of the License, or
 # * (at your option) any later version.
 # *
 # * This program is distributed in the hope that it will be useful,
@@ -26,14 +26,12 @@
 
 from matplotlib import cm
 
-from pyworkflow.em.convert import ImageHandler
-from pyworkflow.em.constants import (COLOR_CHOICES, COLOR_OTHER,
-                                     COLOR_JET, COLOR_TERRAIN, COLOR_GIST_EARTH,
-                                     COLOR_GIST_NCAR, COLOR_GNU_PLOT,
-                                      COLOR_GNU_PLOT2, AX_X, AX_Y, AX_Z)
-from pyworkflow.em.data import Volume
-from pyworkflow.em.viewers import (ChimeraView, EmPlotter, DataView,
-                                  LocalResolutionViewer)
+from pwem.emlib.image import ImageHandler
+from pwem.constants import (COLOR_CHOICES, COLOR_OTHER,
+                            COLOR_JET, AX_Z)
+from pwem.objects import Volume
+from pwem.viewers import (ChimeraView, EmPlotter, DataView,
+                          LocalResolutionViewer)
 from pyworkflow.viewer import CommandView, Viewer
 from pyworkflow.protocol.params import (LabelParam, StringParam,
                                         EnumParam, IntParam)
@@ -45,10 +43,8 @@ from bsoft.protocols import BsoftProtBlocres
 from bsoft.constants import FN_RESOLMAP, FN_HALF1
 
 
-
 class BsoftVolumeView(CommandView):
     def __init__(self, inputFile, **kwargs):
-
         # Small trick to handle .vol Spider volumes
         if inputFile.endswith('.vol'):
             inputFile += ":spi"
@@ -56,11 +52,11 @@ class BsoftVolumeView(CommandView):
         CommandView.__init__(self, 'bshow "%s" &' % inputFile,
                              env=bsoft.Plugin.getEnviron(), **kwargs)
 
-             
+
 class BsoftViewer(Viewer):
     _environments = [DESKTOP_TKINTER]
     _targets = [Volume]
-    
+
     def __init__(self, **kwargs):
         Viewer.__init__(self, **kwargs)
 
@@ -73,6 +69,7 @@ class BsoftViewer(Viewer):
 
 class BsoftPlotter(EmPlotter):
     """ Class to create several plots with Bsoft utilities"""
+
     def __init__(self, x=1, y=1, mainTitle="", **kwargs):
         EmPlotter.__init__(self, x, y, mainTitle, **kwargs)
 
@@ -91,50 +88,49 @@ class BsoftViewerBlocres(LocalResolutionViewer):
     _label = 'viewer blocres'
     _targets = [BsoftProtBlocres]
     _environments = [DESKTOP_TKINTER]
-    
+
     def __init__(self, *args, **kwargs):
-        ProtocolViewer.__init__(self, *args, **kwargs)
+        ProtocolViewer.__init__(self, **kwargs)
 
     def _defineParams(self, form):
         form.addSection(label='Visualization')
-        
+
         form.addParam('doShowVolumeSlices', LabelParam,
                       label="Show resolution slices")
-        
+
         form.addParam('doShowOriginalVolumeSlices', LabelParam,
                       label="Show original volume slices")
 
         form.addParam('doShowResHistogram', LabelParam,
                       label="Show resolution histogram")
-        
+
         group = form.addGroup('Colored resolution Slices and Volumes')
         group.addParam('colorMap', EnumParam, choices=COLOR_CHOICES,
-                      default=COLOR_JET,
-                      label='Color map',
-                      help='Select the color map to apply to the resolution map. '
-                      'http://matplotlib.org/1.3.0/examples/color/colormaps_reference.html.')
-        
+                       default=COLOR_JET,
+                       label='Color map',
+                       help='Select the color map to apply to the resolution map. '
+                            'http://matplotlib.org/1.3.0/examples/color/colormaps_reference.html.')
+
         group.addParam('otherColorMap', StringParam, default='jet',
-                      condition = binaryCondition,
-                      label='Customized Color map',
-                      help='Name of a color map to apply to the resolution map.'
-                      ' Valid names can be found at '
-                      'http://matplotlib.org/1.3.0/examples/color/colormaps_reference.html')
+                       condition=binaryCondition,
+                       label='Customized Color map',
+                       help='Name of a color map to apply to the resolution map.'
+                            ' Valid names can be found at '
+                            'http://matplotlib.org/1.3.0/examples/color/colormaps_reference.html')
         group.addParam('sliceAxis', EnumParam, default=AX_Z,
                        choices=['x', 'y', 'z'],
                        display=EnumParam.DISPLAY_HLIST,
                        label='Slice axis')
         group.addParam('doShowVolumeColorSlices', LabelParam,
                        label="Show colored slices")
-        group.addParam('doShowOneColorslice', LabelParam, 
-                       expertLevel=LEVEL_ADVANCED, 
-                      label='Show selected slice')
+        group.addParam('doShowOneColorslice', LabelParam,
+                       expertLevel=LEVEL_ADVANCED,
+                       label='Show selected slice')
         group.addParam('sliceNumber', IntParam, default=-1,
-                       expertLevel=LEVEL_ADVANCED, 
+                       expertLevel=LEVEL_ADVANCED,
                        label='Show slice number')
         group.addParam('doShowChimera', LabelParam,
-                      label="Show Resolution map in Chimera")
-
+                       label="Show Resolution map in Chimera")
 
     def _getVisualizeDict(self):
         self.protocol._createFilenameTemplates()
@@ -145,10 +141,10 @@ class BsoftViewerBlocres(LocalResolutionViewer):
                 'doShowResHistogram': self._plotHistogram,
                 'doShowChimera': self._showChimera,
                 }
-       
+
     def _showVolumeSlices(self, param=None):
         out_cm = DataView(self.protocol._getFileName(FN_RESOLMAP))
-        
+
         return [out_cm]
 
     def _showOriginalVolumeSlices(self, param=None):
@@ -161,13 +157,13 @@ class BsoftViewerBlocres(LocalResolutionViewer):
         imgData, min_Res, max_Res = self.getImgData(imageFile)
 
         xplotter = BsoftPlotter(x=2, y=2, mainTitle="Local Resolution Slices "
-                                                     "along %s-axis."
-                                                     %self._getAxis())
-        #The slices to be shown are close to the center. Volume size is divided in 
-        # 9 segments, the fouth central ones are selected i.e. 3,4,5,6
-        for i in xrange(3,7): 
+                                                    "along %s-axis."
+                                                    % self._getAxis())
+        # The slices to be shown are close to the center. Volume size is divided in
+        # 9 segments, the four central ones are selected i.e. 3,4,5,6
+        for i in list(range(3, 7)):
             sliceNumber = self.getSlice(i, imgData)
-            a = xplotter.createSubPlot("Slice %s" % (sliceNumber+1), '', '')
+            a = xplotter.createSubPlot("Slice %s" % (sliceNumber + 1), '', '')
             matrix = self.getSliceImage(imgData, sliceNumber, self._getAxis())
             plot = xplotter.plotMatrix(a, matrix, min_Res, max_Res,
                                        cmap=self.getColorMap(),
@@ -180,20 +176,20 @@ class BsoftViewerBlocres(LocalResolutionViewer):
         imgData, min_Res, max_Res = self.getImgData(imageFile)
 
         xplotter = BsoftPlotter(x=1, y=1, mainTitle="Local Resolution Slices "
-                                                     "along %s-axis."
-                                                     %self._getAxis())
+                                                    "along %s-axis."
+                                                    % self._getAxis())
         sliceNumber = self.sliceNumber.get()
         if sliceNumber < 0:
-            x ,_ ,_ ,_ = ImageHandler().getDimensions(imageFile)
-            sliceNumber = x/2
+            x, _, _, _ = ImageHandler().getDimensions(imageFile)
+            sliceNumber = x / 2
         else:
             sliceNumber -= 1
-        #sliceNumber has no sense to start in zero 
-        a = xplotter.createSubPlot("Slice %s" % (sliceNumber+1), '', '')
+        # sliceNumber has no sense to start in zero
+        a = xplotter.createSubPlot("Slice %s" % (sliceNumber + 1), '', '')
         matrix = self.getSliceImage(imgData, sliceNumber, self._getAxis())
         plot = xplotter.plotMatrix(a, matrix, min_Res, max_Res,
-                                       cmap=self.getColorMap(),
-                                       interpolation="nearest")
+                                   cmap=self.getColorMap(),
+                                   interpolation="nearest")
         xplotter.getColorBar(plot)
         return [xplotter]
 
@@ -204,10 +200,10 @@ class BsoftViewerBlocres(LocalResolutionViewer):
         imgList = imgData.flatten()
         imgListNoZero = filter(lambda x: x > 0, imgList)
         nbins = 30
-        plotter = EmPlotter(x=1,y=1,mainTitle="  ")
+        plotter = EmPlotter(x=1, y=1, mainTitle="  ")
         plotter.createSubPlot("Resolution histogram",
                               "Resolution (A)", "# of Counts")
-        fig = plotter.plotHist(imgListNoZero, nbins)
+        fig = plotter.plotHist(list(imgListNoZero), nbins)
         return [plotter]
 
     def _showChimera(self, param=None):
@@ -221,9 +217,9 @@ class BsoftViewerBlocres(LocalResolutionViewer):
 
     def _getAxis(self):
         return self.getEnumText('sliceAxis')
-    
+
     def getColorMap(self):
-        if (COLOR_CHOICES[self.colorMap.get()] is 'other'): 
+        if COLOR_CHOICES[self.colorMap.get()] == 'other':
             cmap = cm.get_cmap(self.otherColorMap.get())
         else:
             cmap = cm.get_cmap(COLOR_CHOICES[self.colorMap.get()])

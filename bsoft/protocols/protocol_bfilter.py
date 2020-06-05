@@ -6,7 +6,7 @@
 # *
 # * This program is free software; you can redistribute it and/or modify
 # * it under the terms of the GNU General Public License as published by
-# * the Free Software Foundation; either version 2 of the License, or
+# * the Free Software Foundation; either version 3 of the License, or
 # * (at your option) any later version.
 # *
 # * This program is distributed in the hope that it will be useful,
@@ -26,13 +26,12 @@
 
 import pyworkflow.utils as pwutils
 import pyworkflow.protocol.params as params
-import pyworkflow.em as em
+from pwem.protocols import ProtFilterParticles
 
 import bsoft
 from bsoft.constants import (FILTER_MEDIAN, FILTER_PEAK,
-                             FILTER_GRADIENT, FILTER_LAPLACIAN,
                              FILTER_DENOISE)
-       
+
 """
 -rescale -0.1,5.2        Rescale data to average and standard deviation after filtering.
 -minmax -0.5,1.2         Rescale data to minimum and maximum.
@@ -65,23 +64,22 @@ Parameters:
 """
 
 
-
-class BsoftProtBfilter(em.ProtFilterParticles):
+class BsoftProtBfilter(ProtFilterParticles):
     """ Wrapper around bfilter program of BSOFT. """
     _label = 'bfilter'
-    
-    def __init__(self, **kwargs):
-        em.ProtFilterParticles.__init__(self, **kwargs)
 
-    #--------------------------- DEFINE param functions ------------------------
+    def __init__(self, **kwargs):
+        ProtFilterParticles.__init__(self, **kwargs)
+
+    # --------------------------- DEFINE param functions ------------------------
     def _defineProcessParams(self, form):
-        form.addParam('filterType', params.EnumParam, 
+        form.addParam('filterType', params.EnumParam,
                       choices=['median', 'peak', 'gradient',
                                'laplacian', 'denoise'],
                       label="Filter type", default=0,
                       help="Select what type of filter do you want to apply.")
         form.addParam('kernelEdgeSize', params.IntParam, default=3,
-                      label='Kernel edge size', 
+                      label='Kernel edge size',
                       condition='filterType==%d or filterType==%d' % (
                           FILTER_MEDIAN, FILTER_PEAK))
 
@@ -91,67 +89,67 @@ class BsoftProtBfilter(em.ProtFilterParticles):
         line.addParam('denoiseDistance', params.IntParam, default=2,
                       label='distance')
         line.addParam('denoiseDensity', params.FloatParam, default=0.4,
-                      label='density')        
+                      label='density')
         form.addParam('wrap', params.BooleanParam, default=False,
                       condition='filterType==%d' % FILTER_DENOISE,
-                      label='Wrap?', 
+                      label='Wrap?',
                       help="Turn wrapping on ")
-        
-#-denoise 2,0.4           Denoising filter: distance and density difference sigmas.
 
-#         line = form.addLine('Frequency', 
-#                             condition='filterType > %d and filterType != %d' % (FILTER_SPACE_REAL,FILTER_FERMI),
-#                             help='Range to apply the filter. Expected values between 0 and 0.5.')
-#         line.addParam('lowFreq', DigFreqParam, condition='filterMode==%d' % FILTER_HIGHPASS, default=0.1,
-#                     label='Lowest')
-#         line.addParam('highFreq', DigFreqParam, condition='filterMode==%d' % FILTER_LOWPASS,
-#                     default=0.2, label='Highest')
-#          
-#         form.addParam('temperature', FloatParam, default=0.3, 
-#                       label='Temperature T:',
-#                       condition='filterType == %d' % FILTER_FERMI,
-#                       help='Enter a temperature parameter T The filter falls off roughly within \n'
-#                            'this reciprocal distance (in terms of frequency units).')     
-        
-    #--------------------------- INSERT steps functions -----------------------
+    # -denoise 2,0.4           Denoising filter: distance and density difference sigmas.
+
+    #         line = form.addLine('Frequency',
+    #                             condition='filterType > %d and filterType != %d' % (FILTER_SPACE_REAL,FILTER_FERMI),
+    #                             help='Range to apply the filter. Expected values between 0 and 0.5.')
+    #         line.addParam('lowFreq', DigFreqParam, condition='filterMode==%d' % FILTER_HIGHPASS, default=0.1,
+    #                     label='Lowest')
+    #         line.addParam('highFreq', DigFreqParam, condition='filterMode==%d' % FILTER_LOWPASS,
+    #                     default=0.2, label='Highest')
+    #
+    #         form.addParam('temperature', FloatParam, default=0.3,
+    #                       label='Temperature T:',
+    #                       condition='filterType == %d' % FILTER_FERMI,
+    #                       help='Enter a temperature parameter T The filter falls off roughly within \n'
+    #                            'this reciprocal distance (in terms of frequency units).')
+
+    # --------------------------- INSERT steps functions -----------------------
     def _insertAllSteps(self):
         # Insert processing steps
         self._insertFunctionStep('convertInputStep', self.inputParticles.get().strId())
         self._insertFunctionStep('filterStep', self.getFilterArgs())
         self._insertFunctionStep('createOutputStep')
 
-    #--------------------------- STEPS functions ------------------------------
+    # --------------------------- STEPS functions ------------------------------
     def convertInputStep(self, strId):
         # we need to put all images into a single stack
         # to ease the call of bsoft programs
         self.inputParticles.get().writeStack(self._getPath('particles.spi:stk'))
-    
+
     def getFilterArgs(self):
         """ Build the bfilter command line base on selected params. 
         Exclude only the input and output files"""
         filterText = self.getEnumText('filterType')
         filterType = self.filterType.get()
-        
+
         # by default use always the filter type as first argument
         args = '-%s' % filterText
-        
+
         if filterType in [FILTER_MEDIAN, FILTER_PEAK]:
             args += ' %d' % self.kernelEdgeSize
         elif filterType == FILTER_DENOISE:
-            args += ' %d,%0.3f' % (self.denoiseDistance, 
+            args += ' %d,%0.3f' % (self.denoiseDistance,
                                    self.denoiseDensity)
-            
+
         return args
-    
+
     def runFilter(self, inputStk, outputStk):
         """ Util function used by wizard. """
-        self.setStepsExecutor() # set default execution
+        self.setStepsExecutor()  # set default execution
         args = self.getFilterArgs()
 
         self.runJob(bsoft.Plugin.getProgram('bfilter'), args +
                     ' %s %s' % (inputStk, outputStk),
                     env=bsoft.Plugin.getEnviron())
-        
+
     def filterStep(self, args):
         """ Apply the selected filter to particles. 
         Create the set of particles.
@@ -164,29 +162,29 @@ class BsoftProtBfilter(em.ProtFilterParticles):
         pwutils.moveFile(tmpStk, particlesStk.replace('.spi', '.stk'))
         # just we prefer stk as stack of spider images
         pwutils.cleanPath(particlesStk)
-        
+
     def createOutputStep(self):
         particlesStk = self._getPath('particles.stk')
         inputSet = self.inputParticles.get()
         outputSet = self._createSetOfParticles()
         outputSet.copyInfo(inputSet)
-    
+
         for i, img in enumerate(inputSet):
-            img.setLocation(i+1, particlesStk)
-            outputSet.append(img)            
-            
+            img.setLocation(i + 1, particlesStk)
+            outputSet.append(img)
+
         self._defineOutputs(outputParticles=outputSet)
         self._defineTransformRelation(inputSet, outputSet)
-        
-#--------------------------- INFO functions -----------------------------------
+
+    # --------------------------- INFO functions -----------------------------------
     def _validate(self):
         errors = []
         return errors
-    
+
     def _summary(self):
         summary = []
         return summary
-    
+
     def _methods(self):
         methods = []
         return methods
