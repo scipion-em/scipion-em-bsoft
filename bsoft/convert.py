@@ -6,7 +6,7 @@
 # *
 # * This program is free software; you can redistribute it and/or modify
 # * it under the terms of the GNU General Public License as published by
-# * the Free Software Foundation; either version 2 of the License, or
+# * the Free Software Foundation; either version 3 of the License, or
 # * (at your option) any later version.
 # *
 # * This program is distributed in the hope that it will be useful,
@@ -54,10 +54,10 @@ def readSetOfCoordinates(outputDir, micSet, coordSet):
                 coord.setMicrograph(mic)
                 coord.setX(coord.getX())
                 coord.setY(coord.getY())
-                
-                coordSet.append(coord)      
+
+                coordSet.append(coord)
                 # Add an unique ID that will be propagated to particles
-                #posMd.setValue(md.MDL_PARTICLE_ID, long(coord.getObjId()), objId)
+                # posMd.setValue(md.MDL_PARTICLE_ID, long(coord.getObjId()), objId)
 
     # reading origin.x value and converting to particle
     # size, can change, we take last value
@@ -69,7 +69,7 @@ def rowToCoordinate(coordRow):
     # Check that all required labels are present in the row
     if _containsAll(coordRow, COOR_DICT):
         coord = Coordinate()
-        rowToObject(coordRow, coord, COOR_DICT)#, extraLabels=COOR_EXTRA_LABELS)
+        rowToObject(coordRow, coord, COOR_DICT)  # , extraLabels=COOR_EXTRA_LABELS)
         # TODO: switch back on extra labels when
         # sqlite mapper can tolerate dots in label names
     else:
@@ -134,7 +134,7 @@ def writeSetOfParticles(imgSet, starFile, stackFile):
     imgSet._bsoftStar = String(starFile)
 
 
-def createBsoftInputParticles(imgSet, starFile, stackFile): 
+def createBsoftInputParticles(imgSet, starFile, stackFile):
     """ Ensure that 'starFile' is a valid STAR files with particles.
     If the imgSet comes from Bsoft, just create a link.
     If not, then write the proper file.

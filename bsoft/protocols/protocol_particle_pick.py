@@ -8,7 +8,7 @@
 # *
 # * This program is free software; you can redistribute it and/or modify
 # * it under the terms of the GNU General Public License as published by
-# * the Free Software Foundation; either version 2 of the License, or
+# * the Free Software Foundation; either version 3 of the License, or
 # * (at your option) any later version.
 # *
 # * This program is distributed in the hope that it will be useful,
@@ -41,15 +41,15 @@ class BsoftProtParticlePicking(ProtParticlePicking):
     """Protocol to pick particles in a set of micrographs using bsoft"""
     _label = 'particle picking'
 
-    def __init__(self, **args):        
+    def __init__(self, **args):
         ProtParticlePicking.__init__(self, **args)
         # The following attribute is only for testing
-        
+
     def _defineParams(self, form):
         ProtParticlePicking._defineParams(self, form)
         form.addParam('memory', FloatParam, default=2,
                       label='Memory to use (In Gb)', expertLevel=2)
-        
+
     def _insertAllSteps(self):
         """The Particle Picking process is realized for a set of micrographs"""
         # Get pointer to input micrographs
@@ -63,9 +63,9 @@ class BsoftProtParticlePicking(ProtParticlePicking):
         outputdir = self._getExtraPath()
         for mic in self.inputMics:
             micfile = abspath(mic.getFileName())
-            args = "%s %s"%(micfile, outputdir)
+            args = "%s %s" % (micfile, outputdir)
             self.runJob("ln -sf", args)
-            
+
         self._enterDir(outputdir)
         for mic in self.inputMics:
             self.runJob(bsoft.Plugin.getProgram('bshow'), basename(mic.getFileName()),
@@ -74,15 +74,15 @@ class BsoftProtParticlePicking(ProtParticlePicking):
         # Open dialog to request confirmation to create output
         if askYesNo(Message.TITLE_SAVE_OUTPUT,
                     Message.LABEL_SAVE_OUTPUT, None):
-            self._leaveDir() # going back to project dir
+            self._leaveDir()  # going back to project dir
             self._createOutput(outputdir)
 
     def readSetOfCoordinates(self, workingDir, coordSet):
         readSetOfCoordinates(workingDir, self.inputMics, coordSet)
-        
+
     def _methods(self):
         return ProtParticlePicking._methods(self)
-    
+
     def _summary(self):
         return ProtParticlePicking._summary(self)
 
