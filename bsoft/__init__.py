@@ -31,6 +31,7 @@ from pyworkflow.utils import Environ
 
 from bsoft.constants import BSOFT_HOME, V1_9_0
 
+__version__ = '3.0.2'
 _logo = "bsoft_logo.png"
 _references = ['Heymann2007']
 
