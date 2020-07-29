@@ -23,6 +23,7 @@
 # *  e-mail address 'scipion@cnb.csic.es'
 # *
 # **************************************************************************
+import os
 
 from matplotlib import cm
 
@@ -209,7 +210,7 @@ class BsoftViewerBlocres(LocalResolutionViewer):
     def _showChimera(self, param=None):
         fnResVol = self.protocol._getFileName(FN_RESOLMAP)
         fnOrigMap = self.protocol._getFileName(FN_HALF1)
-        cmdFile = self.protocol._getExtraPath('chimera_resolution_map.cmd')
+        cmdFile = os.path.abspath(self.protocol._getExtraPath('chimera_resolution_map.py'))
         sampRate = self.protocol.resolution_Volume.getSamplingRate()
         self.createChimeraScript(cmdFile, fnResVol, fnOrigMap, sampRate)
         view = ChimeraView(cmdFile)
