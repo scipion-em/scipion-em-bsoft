@@ -33,34 +33,35 @@ from bsoft.constants import (FILTER_MEDIAN, FILTER_PEAK,
                              FILTER_DENOISE)
 
 """
--rescale -0.1,5.2        Rescale data to average and standard deviation after filtering.
--minmax -0.5,1.2         Rescale data to minimum and maximum.
--average 7,5,3           Averaging/smoothing filter: kernel size.
--median 3                Median filter: kernel edge size.
--peak 5                  Peak filter: kernel edge size.
--gradient                Gradient filter (3x3x3).
--laplacian               Laplacian filter (3x3x3).
--denoise 2,0.4           Denoising filter: distance and density difference sigmas.
--rollingball 5,4.3       Rolling ball filter: radius and density scaling (default scaling=1).
--variance 11,1           Calculate a local variance image using the given size kernel,
-                         with a flag to indicate standard deviation rather than variance.
--extremes his            Filter image extremes: his=histogram-based, mg=for micrograph.
--replacemaxima 1.5       Replace maxima above the given threshold with surrounding average.
--bandpass 25.3,200,0.02  Bandpass filter: resolution limits (angstrom) and band edge width (1/angstrom).
--amplitude 8.3           Amplitude filter: setting all amplitudes below the threshold to zero.
--phasesonly              Set all amplitudes to one.
--Bfactor 44,25.3,20      B-factor application: B-factor (A^2), high resolution limit (A,optional)
-                         and constant factor resolution limit (A).
-                         Multiplied in reciprocal space by exp(-B-factor/4 * s^2) up to the first
-                         resolution limit, and then kept constant up to the second limit.
--gaussratio 60,35,0.2    Reciprocal space ratio of gaussians amplitude adjustment (B1,B2,a).
-                         Ratio = exp(-B2/4*s^2) / ((1-a) + a*exp(-B1/4*s^2)).
- 
+
+-invert	            Invert density in the image.
+-rescale -0.1,5.2	Rescale data to average and standard deviation after filtering.
+-minmax -0.5,1.2	Rescale data to minimum and maximum.
+-average 7,5,3	    Averaging/smoothing filter: kernel size.
+-gaussian 11,2.6	Gaussian smoothing filter: kernel size and sigma.
+-median 3	        Median filter: kernel edge size.
+-peak 5	            Peak filter: kernel edge size.
+-gradient	        Gradient filter (3x3x3).
+-laplacian	        Laplacian filter (3x3x3).
+-LoG 2.5	        Laplacian-of-Gaussian filter.
+-DoG 1.5,3.1	    Difference-of-Gaussians filter.
+-denoise 2,0.4	    Denoising filter: distance and density difference sigmas.
+-rollingball 5,4.3	Rolling ball filter: radius and density scaling (default scaling=1).
+-variance 11,1	    Calculate a local variance image using the given size kernel,
+                    with a flag to indicate standard deviation rather than variance.
+-extremes his	    Filter image extremes: his=histogram-based, mg=for micrograph.
+-replacemaxima 1.5	Replace maxima above the given threshold with surrounding average.
+-bandpass 25.3,200,0.02	Bandpass filter: resolution limits (angstrom) and band edge width (1/angstrom).
+-amplitude 8.3	    Amplitude filter: setting all amplitudes below the threshold to zero.
+-phasesonly	        Set all amplitudes to one.
+-Bfactor 44,25.3	B-factor application: B-factor (A^2), high resolution limit (A,optional)
+                    Multiplied in reciprocal space by exp(-B-factor/4 * s^2).
+
 Parameters:
--verbose 1               Verbosity of output.
--datatype u              Force writing of a new data type.
--sampling 1.5,1.5,1.5    Sampling (A/pixel; default from input file; a single value can be given).
--wrap                    Turn wrapping on (default off, use with -denoise option).
+-verbose 1	        Verbosity of output.
+-datatype u	        Force writing of a new data type.
+-sampling 1.5,1.5,1.5	Sampling (A/pixel; default from input file; a single value can be given).
+-wrap	            Turn wrapping on (default off, use with -denoise option).
 """
 
 
@@ -176,7 +177,7 @@ class BsoftProtBfilter(ProtFilterParticles):
         self._defineOutputs(outputParticles=outputSet)
         self._defineTransformRelation(inputSet, outputSet)
 
-    # --------------------------- INFO functions -----------------------------------
+    # --------------------------- INFO functions ------------------------------
     def _validate(self):
         errors = []
         return errors

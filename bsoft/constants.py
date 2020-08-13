@@ -29,7 +29,7 @@ from collections import OrderedDict
 BSOFT_HOME = 'BSOFT_HOME'
 
 # Supported Versions
-V1_9_0 = '1.9.0'
+V2_0_7 = '2.0.7'
 
 # Bfilter constants
 FILTER_MEDIAN = 0
@@ -49,4 +49,3 @@ COOR_DICT = OrderedDict([
              ("_x", "particle.x"),
              ("_y", "particle.y")
              ])
-

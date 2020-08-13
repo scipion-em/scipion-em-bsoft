@@ -25,4 +25,4 @@
 # **************************************************************************
 
 from .test_protocols_bsoft_blocres import (TestBsoftBlocres,
-                                          TestBsoftBlocresBase)
+                                           TestBsoftBlocresBase)

@@ -23,8 +23,6 @@
 # *  e-mail address 'scipion@cnb.csic.es'
 # *
 # **************************************************************************
-import os
-
 from matplotlib import cm
 
 from pwem.emlib.image import ImageHandler
@@ -75,7 +73,7 @@ class BsoftPlotter(EmPlotter):
         EmPlotter.__init__(self, x, y, mainTitle, **kwargs)
 
 
-binaryCondition = ('(colorMap == %d) ' % (COLOR_OTHER))
+binaryCondition = ('(colorMap == %d) ' % COLOR_OTHER)
 
 
 class BsoftViewerBlocres(LocalResolutionViewer):
@@ -155,7 +153,7 @@ class BsoftViewerBlocres(LocalResolutionViewer):
 
     def _showVolumeColorSlices(self, param=None):
         imageFile = self.protocol._getFileName(FN_RESOLMAP)
-        imgData, min_Res, max_Res = self.getImgData(imageFile)
+        imgData, min_Res, max_Res, _ = self.getImgData(imageFile)
 
         xplotter = BsoftPlotter(x=2, y=2, mainTitle="Local Resolution Slices "
                                                     "along %s-axis."
@@ -174,7 +172,7 @@ class BsoftViewerBlocres(LocalResolutionViewer):
 
     def _showOneColorslice(self, param=None):
         imageFile = self.protocol._getFileName(FN_RESOLMAP)
-        imgData, min_Res, max_Res = self.getImgData(imageFile)
+        imgData, min_Res, max_Res, _ = self.getImgData(imageFile)
 
         xplotter = BsoftPlotter(x=1, y=1, mainTitle="Local Resolution Slices "
                                                     "along %s-axis."
@@ -204,13 +202,13 @@ class BsoftViewerBlocres(LocalResolutionViewer):
         plotter = EmPlotter(x=1, y=1, mainTitle="  ")
         plotter.createSubPlot("Resolution histogram",
                               "Resolution (A)", "# of Counts")
-        fig = plotter.plotHist(list(imgListNoZero), nbins)
+        plotter.plotHist(list(imgListNoZero), nbins)
         return [plotter]
 
     def _showChimera(self, param=None):
         fnResVol = self.protocol._getFileName(FN_RESOLMAP)
         fnOrigMap = self.protocol._getFileName(FN_HALF1)
-        cmdFile = os.path.abspath(self.protocol._getExtraPath('chimera_resolution_map.py'))
+        cmdFile = self.protocol._getExtraPath('chimera_resolution_map.cmd')
         sampRate = self.protocol.resolution_Volume.getSamplingRate()
         self.createChimeraScript(cmdFile, fnResVol, fnOrigMap, sampRate)
         view = ChimeraView(cmdFile)

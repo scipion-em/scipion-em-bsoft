@@ -1,3 +1,4 @@
+3.0.3: update bsoft to 2.0.7
 3.0.1:
     - gplv3, pep8 check, setup.py fixes
 8-december-2019 - Migrated to python3
