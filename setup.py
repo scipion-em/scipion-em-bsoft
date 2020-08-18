@@ -25,12 +25,12 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
 setup(
     name='scipion-em-bsoft',  # Required
     version=__version__,  # Required
-    description='Bsoft ready to use in scipion.',  # Required
+    description='Plugin to use Cryoef program within the Scipion framework',  # Required
     long_description=long_description,  # Optional
     url='https://github.com/scipion-em/scipion-em-bsoft',  # Optional
     author='I2PC',  # Optional
     author_email='scipion@cnb.csic.es',  # Optional
-    keywords='scipion cryoem imageprocessing scipion-3.0',  # Optional
+    keywords='scipion electron-microscopy cryo-em structural-biology image-processing scipion-3.0',  # Optional
     packages=find_packages(),
     install_requires=['scipion-em'],
     package_data={  # Optional
