@@ -65,5 +65,6 @@ class Plugin(pwem.Plugin):
     @classmethod
     def defineBinaries(cls, env):
         env.addPackage('bsoft', version='2.0.7',
-                       tar='bsoft2_0_7_CentOS_7.7.1908.tgz',
-                       default=True)
+			            url="https://lsbr.niams.nih.gov/bsoft/bsoft2_0_7_CentOS_7.7.1908.tgz",
+                        buildDir = "bsoft",
+                        default=True)
