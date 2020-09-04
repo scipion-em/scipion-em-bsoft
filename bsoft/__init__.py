@@ -31,7 +31,7 @@ from pyworkflow.utils import Environ
 
 from bsoft.constants import BSOFT_HOME, V2_0_7
 
-__version__ = '3.0.3'
+__version__ = '3.0.4'
 _logo = "bsoft_logo.png"
 _references = ['Heymann2007', 'Heymann2018']
 
@@ -65,5 +65,6 @@ class Plugin(pwem.Plugin):
     @classmethod
     def defineBinaries(cls, env):
         env.addPackage('bsoft', version='2.0.7',
-                       tar='bsoft2_0_7_CentOS_7.7.1908.tgz',
-                       default=True)
+			            url="https://lsbr.niams.nih.gov/bsoft/bsoft2_0_7_CentOS_7.7.1908.tgz",
+                        buildDir = "bsoft",
+                        default=True)

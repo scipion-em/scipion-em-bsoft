@@ -204,6 +204,8 @@ class BsoftProtBlocres(ProtAnalysis3D):
     def getMinMax(self, imageFile):
         img = ImageHandler().read(imageFile)
         imgData = img.getData()
+        # Remove 0's
+        imgData = imgData[np.nonzero(imgData)]
         min_res = round(np.amin(imgData) * 100) / 100
         max_res = round(np.amax(imgData) * 100) / 100
         return min_res, max_res

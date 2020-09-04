@@ -32,9 +32,10 @@ from pyworkflow.utils.path import cleanPath
 import pyworkflow.gui.dialog as dialog
 from pwem.emlib.image import ImageHandler
 from pwem.wizards import (DownsampleDialog, ImagePreviewDialog,
-                          FilterParticlesWizard)
+                          FilterParticlesWizard, ColorScaleWizardBase)
 
 from bsoft.protocols import BsoftProtBfilter
+from bsoft.viewers import BsoftViewerBlocres
 
 
 class BsoftFilterParticlesWizard(FilterParticlesWizard):
@@ -120,3 +121,6 @@ class BsoftFilterDialog(DownsampleDialog):
         img.read(outputPath)
         self.rightImage = img
         self.updateFilteredImage()
+
+class BsoftColorScaleWizard(ColorScaleWizardBase):
+    _targets = ColorScaleWizardBase.defineTargets(BsoftViewerBlocres)
