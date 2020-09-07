@@ -75,31 +75,21 @@ class BsoftProtBlocres(ProtAnalysis3D):
                       help="The local (box) and shell (shell) resolution "
                            "calculations are mutually exclusive.")
         form.addParam('box', params.IntParam, default=20,
-                      condition='(method)',
+                      condition='method',
                       label='Box',
                       help="Kernel size for determining "
                            "local resolution (pixels/voxels).")
         form.addParam('shell', params.IntParam, default=20,
-                      condition='(not method)',
+                      condition='not method',
                       label='Shell',
                       help="Shell width for determining "
                            "radial resolution (pixels/voxels).")
 
-        line = form.addLine('Resolution Criterion')
-        line.addParam('resolutionCriterion', params.EnumParam,
-                      choices=['FSC', 'DPR', 'SSNR', 'RAB'],
-                      default=0,
-                      help="Resolution criterion:\n"
-                           "FSC = Fourier Shell Correlation (default),\n"
-                           "DPR = Differential Phase Residual,\n"
-                           "SSNR = Spectral Signal-to-Noise Ratio,\n"
-                           "RAB = R(A+B) figure of merit.")
-        line.addParam('cutoff', params.FloatParam,
+        form.addParam('cutoff', params.FloatParam,
                       default=0.5,
                       label='Cutoff',
-                      help="Resolution cutoff for the criterion chosen "
-                           "(default: FSC: 0.5, DPR: 45, "
-                           "SSNR: 1, RAB: 0.5).")
+                      help="Resolution cutoff for FSC."
+                           "(default: 0.5).")
 
         form.addSection(label='Parameters')
         form.addParam('step', params.IntParam, default=1,
@@ -168,8 +158,7 @@ class BsoftProtBlocres(ProtAnalysis3D):
         sampling = self.inputVolume.get().getSamplingRate()
         # Actions
         params = ' -v 1'  # No Verbose
-        params += ' -criterion %s' % self.getEnumText("resolutionCriterion")
-        if (self.method):
+        if self.method:
             params += ' -box %i' % self.box.get()
         else:
             params += ' -shell %i' % self.shell.get()
@@ -215,6 +204,8 @@ class BsoftProtBlocres(ProtAnalysis3D):
     def getMinMax(self, imageFile):
         img = ImageHandler().read(imageFile)
         imgData = img.getData()
+        # Remove 0's
+        imgData = imgData[np.nonzero(imgData)]
         min_res = round(np.amin(imgData) * 100) / 100
         max_res = round(np.amax(imgData) * 100) / 100
         return min_res, max_res

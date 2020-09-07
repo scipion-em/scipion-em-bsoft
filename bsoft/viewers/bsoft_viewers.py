@@ -23,7 +23,6 @@
 # *  e-mail address 'scipion@cnb.csic.es'
 # *
 # **************************************************************************
-
 from matplotlib import cm
 
 from pwem.emlib.image import ImageHandler
@@ -32,6 +31,7 @@ from pwem.constants import (COLOR_CHOICES, COLOR_OTHER,
 from pwem.objects import Volume
 from pwem.viewers import (ChimeraView, EmPlotter, DataView,
                           LocalResolutionViewer)
+from pwem.wizards import ColorScaleWizardBase
 from pyworkflow.viewer import CommandView, Viewer
 from pyworkflow.protocol.params import (LabelParam, StringParam,
                                         EnumParam, IntParam)
@@ -74,7 +74,7 @@ class BsoftPlotter(EmPlotter):
         EmPlotter.__init__(self, x, y, mainTitle, **kwargs)
 
 
-binaryCondition = ('(colorMap == %d) ' % (COLOR_OTHER))
+binaryCondition = ('(colorMap == %d) ' % COLOR_OTHER)
 
 
 class BsoftViewerBlocres(LocalResolutionViewer):
@@ -105,18 +105,8 @@ class BsoftViewerBlocres(LocalResolutionViewer):
                       label="Show resolution histogram")
 
         group = form.addGroup('Colored resolution Slices and Volumes')
-        group.addParam('colorMap', EnumParam, choices=COLOR_CHOICES,
-                       default=COLOR_JET,
-                       label='Color map',
-                       help='Select the color map to apply to the resolution map. '
-                            'http://matplotlib.org/1.3.0/examples/color/colormaps_reference.html.')
 
-        group.addParam('otherColorMap', StringParam, default='jet',
-                       condition=binaryCondition,
-                       label='Customized Color map',
-                       help='Name of a color map to apply to the resolution map.'
-                            ' Valid names can be found at '
-                            'http://matplotlib.org/1.3.0/examples/color/colormaps_reference.html')
+
         group.addParam('sliceAxis', EnumParam, default=AX_Z,
                        choices=['x', 'y', 'z'],
                        display=EnumParam.DISPLAY_HLIST,
@@ -131,6 +121,10 @@ class BsoftViewerBlocres(LocalResolutionViewer):
                        label='Show slice number')
         group.addParam('doShowChimera', LabelParam,
                        label="Show Resolution map in Chimera")
+
+        ColorScaleWizardBase.defineColorScaleParams(group,
+                                                    defaultHighest=self.protocol.max_res_init.get(),
+                                                    defaultLowest=self.protocol.min_res_init.get())
 
     def _getVisualizeDict(self):
         self.protocol._createFilenameTemplates()
@@ -154,7 +148,7 @@ class BsoftViewerBlocres(LocalResolutionViewer):
 
     def _showVolumeColorSlices(self, param=None):
         imageFile = self.protocol._getFileName(FN_RESOLMAP)
-        imgData, min_Res, max_Res = self.getImgData(imageFile)
+        imgData, min_Res, max_Res, _ = self.getImgData(imageFile)
 
         xplotter = BsoftPlotter(x=2, y=2, mainTitle="Local Resolution Slices "
                                                     "along %s-axis."
@@ -165,7 +159,7 @@ class BsoftViewerBlocres(LocalResolutionViewer):
             sliceNumber = self.getSlice(i, imgData)
             a = xplotter.createSubPlot("Slice %s" % (sliceNumber + 1), '', '')
             matrix = self.getSliceImage(imgData, sliceNumber, self._getAxis())
-            plot = xplotter.plotMatrix(a, matrix, min_Res, max_Res,
+            plot = xplotter.plotMatrix(a, matrix, self.lowest.get(), self.highest.get(),
                                        cmap=self.getColorMap(),
                                        interpolation="nearest")
         xplotter.getColorBar(plot)
@@ -173,7 +167,7 @@ class BsoftViewerBlocres(LocalResolutionViewer):
 
     def _showOneColorslice(self, param=None):
         imageFile = self.protocol._getFileName(FN_RESOLMAP)
-        imgData, min_Res, max_Res = self.getImgData(imageFile)
+        imgData, min_Res, max_Res, _ = self.getImgData(imageFile)
 
         xplotter = BsoftPlotter(x=1, y=1, mainTitle="Local Resolution Slices "
                                                     "along %s-axis."
@@ -184,10 +178,11 @@ class BsoftViewerBlocres(LocalResolutionViewer):
             sliceNumber = x / 2
         else:
             sliceNumber -= 1
+
         # sliceNumber has no sense to start in zero
         a = xplotter.createSubPlot("Slice %s" % (sliceNumber + 1), '', '')
         matrix = self.getSliceImage(imgData, sliceNumber, self._getAxis())
-        plot = xplotter.plotMatrix(a, matrix, min_Res, max_Res,
+        plot = xplotter.plotMatrix(a, matrix, self.lowest.get(), self.highest.get() ,
                                    cmap=self.getColorMap(),
                                    interpolation="nearest")
         xplotter.getColorBar(plot)
@@ -203,15 +198,18 @@ class BsoftViewerBlocres(LocalResolutionViewer):
         plotter = EmPlotter(x=1, y=1, mainTitle="  ")
         plotter.createSubPlot("Resolution histogram",
                               "Resolution (A)", "# of Counts")
-        fig = plotter.plotHist(list(imgListNoZero), nbins)
+        plotter.plotHist(list(imgListNoZero), nbins)
         return [plotter]
 
     def _showChimera(self, param=None):
         fnResVol = self.protocol._getFileName(FN_RESOLMAP)
-        fnOrigMap = self.protocol._getFileName(FN_HALF1)
-        cmdFile = self.protocol._getExtraPath('chimera_resolution_map.cmd')
+        fnOrigMap = self.protocol.inputVolume.get().getFileName()
+        cmdFile = self.protocol._getExtraPath('chimera_resolution_map.py')
         sampRate = self.protocol.resolution_Volume.getSamplingRate()
-        self.createChimeraScript(cmdFile, fnResVol, fnOrigMap, sampRate)
+        self.createChimeraScript(cmdFile, fnResVol, fnOrigMap, sampRate,
+                                 numColors=self.intervals.get(),
+                                 lowResLimit=self.highest.get(),
+                                 highResLimit=self.lowest.get())
         view = ChimeraView(cmdFile)
         return [view]
 
@@ -219,10 +217,11 @@ class BsoftViewerBlocres(LocalResolutionViewer):
         return self.getEnumText('sliceAxis')
 
     def getColorMap(self):
-        if COLOR_CHOICES[self.colorMap.get()] == 'other':
-            cmap = cm.get_cmap(self.otherColorMap.get())
-        else:
-            cmap = cm.get_cmap(COLOR_CHOICES[self.colorMap.get()])
+
+        cmap = cm.get_cmap(self.colorMap.get())
         if cmap is None:
             cmap = cm.jet
         return cmap
+
+    def getImgData(self, imgFile):
+        return LocalResolutionViewer.getImgData(self, imgFile,maxMaskValue = 199.9)

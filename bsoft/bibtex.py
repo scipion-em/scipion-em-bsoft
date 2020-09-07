@@ -53,4 +53,16 @@ url = "http://www.sciencedirect.com/science/article/pii/S1047847713002086",
 author = "Giovanni Cardone and Bernard Heymann and Alasdair Steven",
 }
 
+@article{Heymann2018,
+title = "Guidelines for using Bsoft for high resolution reconstruction and validation of biomolecular structures from electron micrographs",
+journal = "Protein Sci.",
+volume = "27",
+number = "1",
+pages = "159 - 171",
+year = "2018",
+doi = "https://doi.org/10.1002/pro.3293",
+url = "https://onlinelibrary.wiley.com/doi/full/10.1002/pro.3293",
+author = "J. Bernard Heymann",
+}
+
 """
