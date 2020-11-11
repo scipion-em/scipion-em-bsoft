@@ -29,7 +29,7 @@ import os
 import pwem
 from pyworkflow.utils import Environ
 
-from bsoft.constants import BSOFT_HOME, V2_0_7, V1_9_0
+from bsoft.constants import BSOFT_HOME, V2_0_7, V1_9_0, BSOFT
 
 __version__ = '3.0.5'
 _logo = "bsoft_logo.png"
@@ -43,7 +43,7 @@ class Plugin(pwem.Plugin):
 
     @classmethod
     def _defineVariables(cls):
-        cls._defineEmVar(BSOFT_HOME, 'bsoft-2.0.7')
+        cls._defineEmVar(BSOFT_HOME, BSOFT + "-" + V2_0_7)
 
     @classmethod
     def getEnviron(cls, bsoftVersion=None):
@@ -63,7 +63,7 @@ class Plugin(pwem.Plugin):
     @classmethod
     def getHomeFromVersion(self, bsoftVersion):
 
-        return Plugin.getHome() if bsoftVersion is None else os.path.join(pwem.Config.EM_ROOT, bsoftVersion)
+        return Plugin.getHome() if bsoftVersion is None else os.path.join(pwem.Config.EM_ROOT, BSOFT + "-" + bsoftVersion)
 
     @classmethod
     def getProgram(cls, program, bsoftVersion=None):
@@ -73,12 +73,12 @@ class Plugin(pwem.Plugin):
     @classmethod
     def defineBinaries(cls, env):
 
-        env.addPackage('bsoft', version='1.9.0',
+        env.addPackage(BSOFT, version='1.9.0',
                        tar='bsoft1_9_0_Fedora_20.tgz',
                        default=True)
 
-        env.addPackage('bsoft', version='2.0.7',
-			            url="https://lsbr.niams.nih.gov/bsoft/bsoft2_0_7_CentOS_7.7.1908.tgz",
-                        buildDir = "bsoft",
-                        default=True)
+        env.addPackage(BSOFT, version='2.0.7',
+                       url="https://lsbr.niams.nih.gov/bsoft/bsoft2_0_7_CentOS_7.7.1908.tgz",
+                       buildDir = "bsoft",
+                       default=True)
 
