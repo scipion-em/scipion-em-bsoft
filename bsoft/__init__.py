@@ -63,7 +63,7 @@ class Plugin(pwem.Plugin):
     @classmethod
     def getHomeFromVersion(self, bsoftVersion):
 
-        return Plugin.getHome() if bsoftVersion is None else os.path.join(pwem.Config.EM_HOME, bsoftVersion)
+        return Plugin.getHome() if bsoftVersion is None else os.path.join(pwem.Config.EM_ROOT, bsoftVersion)
 
     @classmethod
     def getProgram(cls, program, bsoftVersion=None):
