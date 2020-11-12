@@ -28,8 +28,11 @@ from collections import OrderedDict
 
 BSOFT_HOME = 'BSOFT_HOME'
 
+BSOFT = 'bsoft'
+
 # Supported Versions
 V2_0_7 = '2.0.7'
+V1_9_0 = '1.9.0'
 
 # Bfilter constants
 FILTER_MEDIAN = 0

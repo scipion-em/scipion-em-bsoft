@@ -29,9 +29,9 @@ import os
 import pwem
 from pyworkflow.utils import Environ
 
-from bsoft.constants import BSOFT_HOME, V2_0_7
+from bsoft.constants import BSOFT_HOME, V2_0_7, V1_9_0, BSOFT
 
-__version__ = '3.0.4'
+__version__ = '3.0.5'
 _logo = "bsoft_logo.png"
 _references = ['Heymann2007', 'Heymann2018']
 
@@ -43,28 +43,42 @@ class Plugin(pwem.Plugin):
 
     @classmethod
     def _defineVariables(cls):
-        cls._defineEmVar(BSOFT_HOME, 'bsoft-2.0.7')
+        cls._defineEmVar(BSOFT_HOME, BSOFT + "-" + V2_0_7)
 
     @classmethod
-    def getEnviron(cls, xmippFirst=True):
-        """ Setup the environment variables needed to launch bsoft. """
+    def getEnviron(cls, bsoftVersion=None):
+        """ Setup the environment variables needed to launch bsoft.
+        :param bsoftVersion (optional) pass a version to be used,
+        otherwise will choose default value for BSOFT_HOME"""
         environ = Environ(os.environ)
-        pos = Environ.BEGIN if xmippFirst else Environ.END
+
+        home = cls.getHomeFromVersion(bsoftVersion)
+
         environ.update({
-            'PATH': os.path.join(Plugin.getHome(), 'bin'),
-            'BSOFT': Plugin.getHome()
-        }, position=pos)
+            'PATH': os.path.join(home, 'bin'),
+            'BSOFT': home
+        }, position=Environ.BEGIN)
         return environ
 
     @classmethod
-    def getProgram(cls, program):
+    def getHomeFromVersion(self, bsoftVersion):
+
+        return Plugin.getHome() if bsoftVersion is None else os.path.join(pwem.Config.EM_ROOT, BSOFT + "-" + bsoftVersion)
+
+    @classmethod
+    def getProgram(cls, program, bsoftVersion=None):
         """ Return the program binary that will be used. """
-        cmd = cls.getHome('bin', program)
-        return str(cmd)
+        return os.path.join(cls.getHomeFromVersion(bsoftVersion),"bin", program)
 
     @classmethod
     def defineBinaries(cls, env):
-        env.addPackage('bsoft', version='2.0.7',
-			            url="https://lsbr.niams.nih.gov/bsoft/bsoft2_0_7_CentOS_7.7.1908.tgz",
-                        buildDir = "bsoft",
-                        default=True)
+
+        env.addPackage(BSOFT, version='1.9.0',
+                       tar='bsoft1_9_0_Fedora_20.tgz',
+                       default=True)
+
+        env.addPackage(BSOFT, version='2.0.7',
+                       url="https://lsbr.niams.nih.gov/bsoft/bsoft2_0_7_CentOS_7.7.1908.tgz",
+                       buildDir = "bsoft",
+                       default=True)
+
