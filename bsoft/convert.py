@@ -89,7 +89,7 @@ def rowToObject(row, obj, attrDict, extraLabels=[]):
     # Bsoft does not have analogous label for MDL_ENABLED
     obj.setEnabled(True)
 
-    for attr, label in attrDict.iteritems():
+    for attr, label in attrDict.items():
         # all Bsoft labels are strings, so convert to float
         value = float(row.getValue(label))
         if not hasattr(obj, attr):
