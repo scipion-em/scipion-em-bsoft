@@ -29,7 +29,7 @@ import os
 import pwem
 from pyworkflow.utils import Environ
 
-from bsoft.constants import BSOFT_HOME, V2_0_7, V1_9_0, BSOFT
+from bsoft.constants import BSOFT_HOME, V2_1_3, BSOFT
 
 __version__ = '3.0.6'
 _logo = "bsoft_logo.png"
@@ -39,11 +39,11 @@ _references = ['Heymann2007', 'Heymann2018']
 class Plugin(pwem.Plugin):
     _homeVar = BSOFT_HOME
     _pathVars = [BSOFT_HOME]
-    _supportedVersions = [V2_0_7]
+    _supportedVersions = [V2_1_3]
 
     @classmethod
     def _defineVariables(cls):
-        cls._defineEmVar(BSOFT_HOME, BSOFT + "-" + V2_0_7)
+        cls._defineEmVar(BSOFT_HOME, BSOFT + "-" + V2_1_3)
 
     @classmethod
     def getEnviron(cls, bsoftVersion=None):

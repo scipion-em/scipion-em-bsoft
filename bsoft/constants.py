@@ -31,8 +31,7 @@ BSOFT_HOME = 'BSOFT_HOME'
 BSOFT = 'bsoft'
 
 # Supported Versions
-V2_0_7 = '2.0.7'
-V1_9_0 = '1.9.0'
+V2_1_3 = '2.1.3'
 
 # Bfilter constants
 FILTER_MEDIAN = 0
