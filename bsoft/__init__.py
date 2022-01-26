@@ -29,9 +29,9 @@ import os
 import pwem
 from pyworkflow.utils import Environ
 
-from bsoft.constants import BSOFT_HOME, V2_0_7, V1_9_0, BSOFT
+from bsoft.constants import BSOFT_HOME, V2_1_3, BSOFT
 
-__version__ = '3.0.5'
+__version__ = '3.0.6'
 _logo = "bsoft_logo.png"
 _references = ['Heymann2007', 'Heymann2018']
 
@@ -39,11 +39,11 @@ _references = ['Heymann2007', 'Heymann2018']
 class Plugin(pwem.Plugin):
     _homeVar = BSOFT_HOME
     _pathVars = [BSOFT_HOME]
-    _supportedVersions = [V2_0_7]
+    _supportedVersions = [V2_1_3]
 
     @classmethod
     def _defineVariables(cls):
-        cls._defineEmVar(BSOFT_HOME, BSOFT + "-" + V2_0_7)
+        cls._defineEmVar(BSOFT_HOME, BSOFT + "-" + V2_1_3)
 
     @classmethod
     def getEnviron(cls, bsoftVersion=None):
@@ -73,12 +73,9 @@ class Plugin(pwem.Plugin):
     @classmethod
     def defineBinaries(cls, env):
 
-        env.addPackage(BSOFT, version='1.9.0',
-                       tar='bsoft1_9_0_Fedora_20.tgz',
-                       default=True)
 
-        env.addPackage(BSOFT, version='2.0.7',
-                       url="https://lsbr.niams.nih.gov/bsoft/bsoft2_0_7_CentOS_7.7.1908.tgz",
+        env.addPackage(BSOFT, version='2.1.3',
+                       url="https://github.com/jbheymann/Bsoft/raw/main/bsoft2_1_3_Red_7.9.tgz",
                        buildDir = "bsoft",
                        default=True)
 
