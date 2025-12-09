@@ -27,6 +27,7 @@
 import os
 
 import pwem
+from pyworkflow import SPA
 from pyworkflow.utils import Environ
 
 from bsoft.constants import BSOFT_HOME, V2_1_3, BSOFT
@@ -40,6 +41,7 @@ class Plugin(pwem.Plugin):
     _homeVar = BSOFT_HOME
     _pathVars = [BSOFT_HOME]
     _supportedVersions = [V2_1_3]
+    _processingField = [SPA]
 
     @classmethod
     def _defineVariables(cls):
