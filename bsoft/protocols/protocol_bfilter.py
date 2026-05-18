@@ -67,6 +67,55 @@ Parameters:
 
 class BsoftProtBfilter(ProtFilterParticles):
     """ Wrapper around bfilter program of BSOFT. """
+
+    """
+            The Bfilter protocol applies different spatial filtering
+            operations to cryo-EM particle images using the BSOFT
+            bfilter program. Its main purpose is to improve image
+            quality, enhance structural features, or reduce noise
+            before downstream image processing and analysis.
+
+            Inputs and General Workflow
+
+            The protocol requires a set of input particles that are
+            converted into a single image stack for efficient processing.
+            During execution, the selected filtering method is applied
+            uniformly to all particles, and the filtered images are
+            written into a new output stack while preserving the original
+            particle metadata and relationships.
+
+            Filtering Strategies
+
+            The protocol supports several filtering approaches,
+            including median, peak, gradient, laplacian, and denoising
+            filters. Median and peak filters operate using a configurable
+            kernel size and are commonly used to suppress local image
+            artifacts or enhance contrast. Gradient and laplacian filters
+            emphasize intensity transitions and structural edges, which
+            may help highlight particle boundaries or fine details.
+
+            The denoising mode applies smoothing based on distance and
+            density similarity parameters. From a biological perspective,
+            denoising can improve the visibility of weak structural
+            features, although excessive smoothing may remove meaningful
+            high-resolution information.
+
+            Outputs and Interpretation
+
+            After execution, the protocol produces a new filtered particle
+            set in which each particle points to the processed image stack.
+            The output preserves the organization and metadata of the
+            original dataset while incorporating the selected filtering
+            operation.
+
+            Final Perspective
+
+            BsoftProtBfilter provides a simple and flexible framework for
+            applying spatial filters to cryo-EM particle datasets. Careful
+            selection of the filtering strategy and parameters is important
+            to balance noise reduction and preservation of biologically
+            relevant structural information.
+        """
     _label = 'bfilter'
 
     def __init__(self, **kwargs):

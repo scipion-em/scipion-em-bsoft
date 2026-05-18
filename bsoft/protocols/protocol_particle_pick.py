@@ -39,6 +39,58 @@ from bsoft.convert import readSetOfCoordinates
 
 class BsoftProtParticlePicking(ProtParticlePicking):
     """Protocol to pick particles in a set of micrographs using bsoft"""
+
+    """
+        Particle Picking (BsoftProtParticlePicking) — User Manual
+
+            Overview
+
+            The Particle Picking protocol provides an interactive framework
+            for manually selecting particles from cryo-EM micrographs using
+            the BSOFT visualization tools. Its main purpose is to generate
+            particle coordinate datasets through direct visual inspection
+            of experimental micrographs.
+
+            Inputs and General Workflow
+
+            The protocol requires a set of input micrographs that will be
+            inspected during the picking session. Before execution, the
+            micrographs are linked into the working directory to allow
+            direct access from the BSOFT graphical environment. An optional
+            memory parameter can also be adjusted to optimize performance
+            when processing large datasets.
+
+            Interactive Particle Picking
+
+            During execution, the protocol launches the BSOFT `bshow`
+            graphical interface for each micrograph. Users manually inspect
+            the images and identify particle positions interactively,
+            allowing direct evaluation of particle quality, contamination,
+            aggregation, or structural heterogeneity.
+
+            From a biological perspective, manual picking remains especially
+            useful for challenging cryo-EM datasets where automated methods
+            may fail because of low contrast, flexible particles, or noisy
+            backgrounds. The interactive workflow allows users to apply
+            biological knowledge and visual criteria when selecting
+            meaningful particles for downstream analysis.
+
+            Outputs and Interpretation
+
+            After the picking session is completed and confirmed, the
+            protocol generates a set of particle coordinates associated
+            with the original micrographs. These coordinates can be used
+            directly in downstream extraction, classification, and
+            reconstruction workflows.
+
+            Final Perspective
+
+            BsoftProtParticlePicking provides a practical framework for
+            interactive particle selection in cryo-EM workflows. By
+            combining direct visualization with user-guided coordinate
+            assignment, the protocol helps generate reliable particle
+            datasets for downstream structural analysis.
+        """
     _label = 'particle picking'
 
     def __init__(self, **args):

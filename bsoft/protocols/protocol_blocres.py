@@ -43,6 +43,55 @@ class BsoftProtBlocres(ProtAnalysis3D):
     It calculates the local resolution map from to half maps.
     The method is based on a local measurement inside a mobile window.
     """
+
+    """
+            The Blocres protocol computes a local resolution map from two
+            half maps using the BSOFT blocres program. Its main purpose is
+            to estimate spatial resolution variations across a 3D cryo-EM
+            reconstruction, allowing users to identify regions with higher
+            or lower structural reliability.
+
+            Inputs and General Workflow
+
+            The protocol requires two half volumes representing independent
+            reconstructions of the same structure. Optionally, a mask volume
+            can be provided to restrict the analysis to biologically relevant
+            regions and exclude solvent areas or background noise. During
+            execution, the input maps are converted into compatible formats
+            and processed using local or shell-based Fourier Shell Correlation
+            calculations.
+
+            Local Resolution Estimation
+
+            The protocol supports two resolution estimation strategies.
+            The box-based method computes local resolution inside a moving
+            window across the volume, making it suitable for detecting
+            localized structural variability. The shell-based method instead
+            evaluates radial resolution variations using concentric shells.
+
+            Several parameters control the analysis, including box or shell
+            size, sampling step, FSC cutoff, padding, symmetry, smoothing,
+            and maximum resolution. From a biological perspective, careful
+            masking and appropriate parameter selection are important to
+            avoid misleading local resolution estimates in flexible or noisy
+            regions.
+
+            Outputs and Interpretation
+
+            After execution, the protocol produces a local resolution map
+            in which voxel values represent estimated spatial resolution.
+            The output volume preserves the sampling rate of the original
+            reconstruction and can be visualized to identify highly resolved
+            regions as well as flexible or poorly defined areas.
+
+            Final Perspective
+
+            BsoftProtBlocres provides a practical framework for analyzing
+            local resolution heterogeneity in cryo-EM maps. By combining
+            independent half maps with localized FSC measurements, the
+            protocol helps users evaluate reconstruction quality and better
+            interpret structural variability across macromolecular complexes.
+        """
     _label = 'blocres'
 
     def __init__(self, **args):
